@@ -29,15 +29,15 @@ export class CallbacksService {
     const jambonz = new WebhookResponse();
 
     if (result.digits === callDetails?.digitContinue) {
-      logger.debug('Continuing the call %s to %s', result.call_sid, callDetails.destinationAddress);
+      logger.debug(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
       const dialTarget = callDetails.destinationAddress.includes('@')
         ? { type: 'user', name: callDetails.destinationAddress }
         : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
-      return jambonz.play({ url: callDetails.wavUrlContinue }).dial({ target: dialTarget });
+      return jambonz.play({ url: callDetails.wavUrlContinue }).dial({ target: [dialTarget] });
     }
 
     if (result.digits === callDetails?.digitOptOut) {
-      logger.debug('Caller opted out using digit %s on call %s', result.digits, result.call_sid);
+      logger.debug(`Caller opted out using digit ${result.digits} on call ${result.call_sid}`);
       return jambonz.play({ url: callDetails.wavUrlOptOut });
     }
 
