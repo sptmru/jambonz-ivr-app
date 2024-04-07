@@ -11,6 +11,10 @@ export class CallsService {
         name: `${callDetails.numberTo}@${config.jambonz.sipRealm}`,
       },
       application_sid: config.jambonz.applicationSid,
+      // amd: {
+      //   hook: `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
+      //   disconnectOnAMD: true,
+      // },
     });
   }
 }
