@@ -3,8 +3,8 @@ import { config } from '../../infrastructure/config/config';
 export const swaggerOptions = {
   openapi: {
     info: {
-      title: 'Asterisk Callout API',
-      description: 'Asterisk Callout API Documentation',
+      title: 'IVR API',
+      description: 'IVR API Documentation',
       version: '1.0.0',
     },
     consumes: ['application/json'],
