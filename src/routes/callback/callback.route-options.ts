@@ -48,3 +48,49 @@ export const StatusCallbackRouteOptions: RouteOptionsWithoutHandler = {
     },
   },
 };
+
+export const AmdCallbackRouteOptions: RouteOptionsWithoutHandler = {
+  method: 'POST',
+  url: '/api/v1/amd-callback',
+  schema: {
+    description: 'Accepts AMD callback and proceeds with the call logic',
+    summary: 'Check AMD results and proceed with the call',
+    tags: ['callbacks'],
+    response: {
+      200: {
+        description: 'AMD processed successfully',
+        type: 'array',
+      },
+      500: {
+        description: 'Error when getting AMD',
+        type: 'object',
+        properties: {
+          error: { type: 'string' },
+        },
+      },
+    },
+  },
+};
+
+export const DtmfCallbackRouteOptions: RouteOptionsWithoutHandler = {
+  method: 'POST',
+  url: '/api/v1/dtmf-callback',
+  schema: {
+    description: 'Accepts DTMF callback and proceeds with the call logic',
+    summary: 'Check DTMF results and proceed with the call',
+    tags: ['callbacks'],
+    response: {
+      200: {
+        description: 'DTMF processed successfully',
+        type: 'array',
+      },
+      500: {
+        description: 'Error when getting DTMF',
+        type: 'object',
+        properties: {
+          error: { type: 'string' },
+        },
+      },
+    },
+  },
+};

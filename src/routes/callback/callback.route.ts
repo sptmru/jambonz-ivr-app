@@ -1,5 +1,10 @@
 import { FastifyInstance } from 'fastify';
-import { IvrCallbackRouteOptions, StatusCallbackRouteOptions } from './callback.route-options';
+import {
+  AmdCallbackRouteOptions,
+  DtmfCallbackRouteOptions,
+  IvrCallbackRouteOptions,
+  StatusCallbackRouteOptions,
+} from './callback.route-options';
 import { CallbacksController } from '../../controllers/calls/callback.controller';
 
 export class CallbacksRoute {
@@ -9,5 +14,7 @@ export class CallbacksRoute {
   async routes(fastify: FastifyInstance): Promise<void> {
     fastify.post('/ivr-callback', IvrCallbackRouteOptions, CallbacksController.ivrCallback);
     fastify.post('/status-callback', StatusCallbackRouteOptions, CallbacksController.statusCallback);
+    fastify.post('/amd-callback', AmdCallbackRouteOptions, CallbacksController.amdCallback);
+    fastify.post('/dtmf-callback', DtmfCallbackRouteOptions, CallbacksController.dtmfCallback);
   }
 }
