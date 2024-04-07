@@ -27,5 +27,6 @@ export const config = {
   },
   redis: {
     uri: parsedConfig?.REDIS_URI != null ? parsedConfig.REDIS_URI : 'redis://default:lnasdoifna0asd@localhost:6379',
+    jsonType: parsedConfig?.REDIS_JSON_TYPE != null ? parsedConfig.REDIS_JSON_TYPE : 'calldetails',
   },
 };

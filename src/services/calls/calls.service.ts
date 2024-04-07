@@ -1,10 +1,11 @@
 import { CallDetails } from '../../domain/types/calldetails.type';
 import { config } from '../../infrastructure/config/config';
+import { RedisClient } from '../../infrastructure/redis/client';
 import { jambonz } from '../jambons/jambons-api-wrapper.service';
 
 export class CallsService {
   static async createCall(callDetails: CallDetails): Promise<void> {
-    await jambonz.calls.create({
+    const callId = await jambonz.calls.create({
       from: callDetails.numberFrom,
       to: {
         type: 'user', // TODO: change type to "phone"
@@ -16,5 +17,6 @@ export class CallsService {
       //   disconnectOnAMD: true,
       // },
     });
+    await RedisClient.getInstance().saveCallDetails(callId, callDetails);
   }
 }

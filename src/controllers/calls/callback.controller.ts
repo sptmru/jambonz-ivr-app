@@ -39,9 +39,9 @@ export class CallbacksController {
     }
   }
 
-  static dtmfCallback(request: FastifyRequest<{ Body: DtmfResult }>, reply: FastifyReply): FastifyReply {
+  static async dtmfCallback(request: FastifyRequest<{ Body: DtmfResult }>, reply: FastifyReply): Promise<FastifyReply> {
     try {
-      const dtmfHandler = CallbacksService.dtmfCallback(request.body);
+      const dtmfHandler = await CallbacksService.dtmfCallback(request.body);
       logger.debug(`DTMF handler generated`);
       logger.debug(dtmfHandler);
       return reply.code(200).send(dtmfHandler?.payload);
