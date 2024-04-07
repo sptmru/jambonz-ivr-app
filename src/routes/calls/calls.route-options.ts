@@ -18,6 +18,13 @@ export const createCallRouteOptions: RouteOptionsWithoutHandler = {
           message: { type: 'string' },
         },
       },
+      500: {
+        description: 'Error when trying to initiate a call',
+        type: 'object',
+        properties: {
+          error: { type: 'string' },
+        },
+      },
     },
   },
 };
