@@ -3,11 +3,15 @@ import { logger } from '../../misc/Logger';
 import { CallbacksService } from '../../services/calls/callback.service';
 import { AmdResult } from '../../domain/types/amdresult.type';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
+import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
 
 export class CallbacksController {
-  static ivrInitiateCallback(_request: FastifyRequest, reply: FastifyReply): FastifyReply {
+  static async ivrInitiateCallback(
+    request: FastifyRequest<{ Body: IvrInitiateResult }>,
+    reply: FastifyReply
+  ): Promise<FastifyReply> {
     try {
-      const callHandler = CallbacksService.ivrInitiateCallback();
+      const callHandler = await CallbacksService.ivrInitiateCallback(request.body);
       logger.debug(`Call handler generated`);
       logger.debug(callHandler);
       return reply.code(200).send(callHandler?.payload);
