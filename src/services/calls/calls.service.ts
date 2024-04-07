@@ -1,4 +1,5 @@
 import { CallDetails } from '../../domain/types/calldetails.type';
+import { config } from '../../infrastructure/config/config';
 import { jambonz } from '../jambons/jambons-api-wrapper.service';
 
 export class CallsService {
@@ -6,11 +7,10 @@ export class CallsService {
     await jambonz.calls.create({
       from: callDetails.numberFrom,
       to: {
-        type: 'phone',
-        number: callDetails.numberTo,
+        type: 'user', // TODO: change type to "phone"
+        name: `${callDetails.numberTo}@${config.jambonz.sipRealm}`,
       },
-      call_hook: 'http://myurl.com/myapp-webhook',
-      call_status_hook: 'http://myurl.com/call-status',
+      application_sid: config.jambonz.applicationSid,
     });
   }
 }
