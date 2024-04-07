@@ -48,7 +48,7 @@ export class CallbacksService {
     logger.debug('Got AMD result:', result);
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     const jambonz = new WebhookResponse();
-    if (result.type !== AmdResultEnum.HUMAN) {
+    if (result.type === AmdResultEnum.MACHINE) {
       return jambonz.play({ url: callDetails?.wavUrlVM });
     }
   }
