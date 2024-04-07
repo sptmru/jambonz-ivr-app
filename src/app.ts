@@ -6,6 +6,7 @@ import { logger } from './misc/Logger';
 import { CallbacksRoute } from './routes/callback/callback.route';
 import { CallsRoute } from './routes/calls/calls.route';
 import { HealthRoute } from './routes/health/health.route';
+import { CallsService } from './services/calls/calls.service';
 
 const api = new Api({
   plugins: [],
@@ -17,9 +18,7 @@ api.listen();
 
 const mq = new MQClient();
 // eslint-disable-next-line require-await
-mq.consumeToQueue(config.rabbitmq.callsQueue, async message => {
-  logger.debug(`Fake message handler: ${JSON.stringify(message)}`);
-});
+mq.consumeToQueue(config.rabbitmq.callsQueue, CallsService.createCall);
 
 const onShutdown = (): void => {
   void mq.onShutdown();

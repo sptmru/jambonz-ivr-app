@@ -1,9 +1,10 @@
 import Connection, { Consumer } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
+import { CallDetails } from '../../domain/types/calldetails.type';
 
 interface MessageHandler {
-  (param1: string): Promise<void>;
+  (param1: CallDetails): Promise<void>;
 }
 
 export class MQClient {
@@ -29,9 +30,16 @@ export class MQClient {
         qos: { prefetchCount: config.rabbitmq.prefetchCount },
       },
       async msg => {
-        const parsedMessage = JSON.parse(msg.body);
-        logger.debug(`Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`);
-        return await messageHandler(parsedMessage);
+        try {
+          const parsedMessage = JSON.parse(msg.body);
+          logger.debug(`Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`);
+
+          await messageHandler(parsedMessage);
+        } catch (err) {
+          // TODO: handle errors correctly, just pass for now if can't handle
+          logger.error(`Consumer error on queue ${queueName}: ${err}`);
+        }
+        return;
       }
     );
 
