@@ -5,6 +5,7 @@ import { config } from '../../infrastructure/config/config';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
 import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
+import { VoslogicApiWrapper } from '../third-party/voslogic-api-wrapper.service';
 
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
@@ -30,6 +31,12 @@ export class CallbacksService {
 
     if (result.digits === callDetails?.digitContinue) {
       logger.debug(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
+      await VoslogicApiWrapper.sendTransactionData({
+        transactionid: result.call_sid,
+        from: callDetails.numberFrom as string,
+        to: callDetails.numberTo as string,
+        Disposition: 'CONTINUE',
+      });
       const dialTarget = callDetails.destinationAddress.includes('@')
         ? { type: 'user', name: callDetails.destinationAddress }
         : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
@@ -38,6 +45,12 @@ export class CallbacksService {
 
     if (result.digits === callDetails?.digitOptOut) {
       logger.debug(`Caller opted out using digit ${result.digits} on call ${result.call_sid}`);
+      await VoslogicApiWrapper.sendTransactionData({
+        transactionid: result.call_sid,
+        from: callDetails.numberFrom as string,
+        to: callDetails.numberTo as string,
+        Disposition: 'OPTOUT',
+      });
       return jambonz.play({ url: callDetails.wavUrlOptOut });
     }
 
@@ -49,6 +62,12 @@ export class CallbacksService {
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     const jambonz = new WebhookResponse();
     if (result.type === AmdResultEnum.MACHINE) {
+      await VoslogicApiWrapper.sendTransactionData({
+        transactionid: result.call_sid,
+        from: callDetails?.numberFrom as string,
+        to: callDetails?.numberTo as string,
+        Disposition: 'VM',
+      });
       return jambonz.play({ url: callDetails?.wavUrlVM });
     }
   }

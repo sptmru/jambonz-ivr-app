@@ -29,4 +29,12 @@ export const config = {
     uri: parsedConfig?.REDIS_URI != null ? parsedConfig.REDIS_URI : 'redis://default:lnasdoifna0asd@localhost:6379',
     jsonType: parsedConfig?.REDIS_JSON_TYPE != null ? parsedConfig.REDIS_JSON_TYPE : 'calldetails',
   },
+  thirdParty: {
+    voslogic: {
+      apiBaseUrl:
+        parsedConfig?.VOSLOGIC_API_BASE_URL != null
+          ? parsedConfig.VOSLOGIC_API_BASE_URL
+          : 'http://vos-api.voslogic.com/api',
+    },
+  },
 };
