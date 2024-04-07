@@ -2,7 +2,6 @@ import { CallDetailsDefinition } from './domain/definitions/calldetails.definiti
 import { Api } from './infrastructure/api/server';
 import { config } from './infrastructure/config/config';
 import { MQClient } from './infrastructure/rabbitmq/client';
-import { logger } from './misc/Logger';
 import { CallbacksRoute } from './routes/callback/callback.route';
 import { CallsRoute } from './routes/calls/calls.route';
 import { HealthRoute } from './routes/health/health.route';
