@@ -17,6 +17,14 @@ export const swaggerOptions = {
     components: {},
     tags: [
       {
+        name: 'calls',
+        description: 'Calls-related API endpoints',
+      },
+      {
+        name: 'callbacks',
+        description: 'Jambonz callback endpoints',
+      },
+      {
         name: 'monitoring',
         description: 'Monitoring endpoints',
       },
