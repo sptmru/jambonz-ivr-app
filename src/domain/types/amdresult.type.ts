@@ -3,6 +3,7 @@ export type AmdResult = {
   reason?: string;
   hint?: string;
   language?: string;
+  call_sid: string;
 };
 
 // eslint-disable-next-line no-shadow

@@ -32,10 +32,10 @@ export class CallbacksController {
     }
   }
 
-  static amdCallback(request: FastifyRequest<{ Body: AmdResult }>, reply: FastifyReply): FastifyReply {
+  static async amdCallback(request: FastifyRequest<{ Body: AmdResult }>, reply: FastifyReply): Promise<FastifyReply> {
     const result = request.body;
     try {
-      const amdHandler = CallbacksService.amdCallback(result);
+      const amdHandler = await CallbacksService.amdCallback(result);
       return reply.code(200).send(amdHandler?.payload);
     } catch (err) {
       logger.error(`Error while handling a call in AMD callback: ${err.message}`);

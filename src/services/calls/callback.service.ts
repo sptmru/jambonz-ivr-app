@@ -29,21 +29,27 @@ export class CallbacksService {
     const jambonz = new WebhookResponse();
 
     if (result.digits === callDetails?.digitContinue) {
-      return jambonz.say({ text: 'We should continue!' });
+      logger.debug('Continuing the call %s to %s', result.call_sid, callDetails.destinationAddress);
+      const dialTarget = callDetails.destinationAddress.includes('@')
+        ? { type: 'user', name: callDetails.destinationAddress }
+        : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
+      return jambonz.play({ url: callDetails.wavUrlContinue }).dial({ target: dialTarget });
     }
 
     if (result.digits === callDetails?.digitOptOut) {
-      return jambonz.say({ text: 'We should opt out!' });
+      logger.debug('Caller opted out using digit %s on call %s', result.digits, result.call_sid);
+      return jambonz.play({ url: callDetails.wavUrlOptOut });
     }
 
-    return jambonz.say({ text: 'No available options with this digit!' });
+    return jambonz.hangup();
   }
 
-  static amdCallback(result: AmdResult): WebhookResponse {
+  static async amdCallback(result: AmdResult): Promise<WebhookResponse> {
     logger.debug('Got AMD result:', result);
+    const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     const jambonz = new WebhookResponse();
     if (result.type !== AmdResultEnum.HUMAN) {
-      return jambonz.hangup();
+      return jambonz.play({ url: callDetails?.wavUrlVM });
     }
   }
 }
