@@ -25,4 +25,7 @@ export const config = {
     callsQueue: parsedConfig?.RABBITMQ_CALLS_QUEUE != null ? parsedConfig.RABBITMQ_CALLS_QUEUE : 'calls_queue',
     prefetchCount: parsedConfig?.RABBITMQ_PREFETCH_COUNT != null ? Number(parsedConfig.RABBITMQ_PREFETCH_COUNT) : 10,
   },
+  redis: {
+    uri: parsedConfig?.REDIS_URI != null ? parsedConfig.REDIS_URI : 'redis://default:lnasdoifna0asd@localhost:6379',
+  },
 };
