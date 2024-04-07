@@ -6,7 +6,7 @@ import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
 
 export class CallbacksService {
-  static ivrCallback(): WebhookResponse {
+  static ivrInitiateCallback(): WebhookResponse {
     logger.debug(`Handling an IVR callback`);
     const jambonz = new WebhookResponse();
     return jambonz.pause({ length: 1 }).gather({

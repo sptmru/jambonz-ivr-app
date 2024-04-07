@@ -1,6 +1,6 @@
 import { RouteOptionsWithoutHandler } from '../../infrastructure/api/types/RouteOptionsWithoutHandler';
 
-export const IvrCallbackRouteOptions: RouteOptionsWithoutHandler = {
+export const IvrInitiateCallbackRouteOptions: RouteOptionsWithoutHandler = {
   method: 'POST',
   url: '/api/v1/ivr-callback',
   schema: {

@@ -5,9 +5,9 @@ import { AmdResult } from '../../domain/types/amdresult.type';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
 
 export class CallbacksController {
-  static ivrCallback(_request: FastifyRequest, reply: FastifyReply): FastifyReply {
+  static ivrInitiateCallback(_request: FastifyRequest, reply: FastifyReply): FastifyReply {
     try {
-      const callHandler = CallbacksService.ivrCallback();
+      const callHandler = CallbacksService.ivrInitiateCallback();
       logger.debug(`Call handler generated`);
       logger.debug(callHandler);
       return reply.code(200).send(callHandler?.payload);
