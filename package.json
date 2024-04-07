@@ -29,6 +29,7 @@
     "@jambonz/node-client": "^0.3.74",
     "dotenv": "^16.4.5",
     "fastify": "^4.26.2",
+    "rabbitmq-client": "^4.5.3",
     "winston": "^3.13.0"
   }
 }

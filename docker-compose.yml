@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: 'rabbitmq:3.13-management'
+    environment:
+      RABBITMQ_ERLANG_COOKIE: 'SWQOKODSQALRPCLNMEQG'
+      RABBITMQ_DEFAULT_USER: 'rabbitmq'
+      RABBITMQ_DEFAULT_PASS: 'rabbitmq'
+      RABBITMQ_DEFAULT_VHOST: '/'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+
+volumes:
+  rabbitmq_data: {}

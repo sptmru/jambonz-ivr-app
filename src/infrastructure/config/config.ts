@@ -20,4 +20,9 @@ export const config = {
         ? parsedConfig.JAMBONZ_CALLBACK_BASE_URL
         : 'https://ivr-app.domain.com',
   },
+  rabbitmq: {
+    uri: parsedConfig?.RABBITMQ_URI != null ? parsedConfig.RABBITMQ_URI : 'amqp://guest:guest@localhost:5672',
+    callsQueue: parsedConfig?.RABBITMQ_CALLS_QUEUE != null ? parsedConfig.RABBITMQ_CALLS_QUEUE : 'calls_queue',
+    prefetchCount: parsedConfig?.RABBITMQ_PREFETCH_COUNT != null ? Number(parsedConfig.RABBITMQ_PREFETCH_COUNT) : 10,
+  },
 };
