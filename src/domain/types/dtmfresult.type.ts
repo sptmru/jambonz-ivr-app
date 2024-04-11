@@ -1,6 +1,8 @@
+import { CallDirectionEnum } from './ivrinitiateresult.type';
+
 export type DtmfResult = {
   call_sid: string;
-  direction: 'inbound' | 'outbound';
+  direction: CallDirectionEnum;
   from: string;
   to: string;
   call_id: string;
