@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
-import Fastify, { FastifyInstance } from 'fastify';
+import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 
@@ -55,6 +55,14 @@ export class Api {
     definitions.forEach(definition => {
       this.app.addSchema(definition);
     });
+  }
+
+  public static addAuthToRoute(request: FastifyRequest, reply: FastifyReply, done: () => void): FastifyReply | void {
+    const authorization = request.headers.authorization;
+    if (authorization == undefined || authorization !== `Bearer ${config.api.authToken}`) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+    done();
   }
 
   public listen(): void {

@@ -1,8 +1,10 @@
+import { Api } from '../../infrastructure/api/server';
 import { RouteOptionsWithoutHandler } from '../../infrastructure/api/types/RouteOptionsWithoutHandler';
 
 export const createCallRouteOptions: RouteOptionsWithoutHandler = {
   method: 'POST',
   url: '/api/v1/call',
+  preValidation: [Api.addAuthToRoute],
   schema: {
     description: 'Accepts an object with call options and initiates a call',
     summary: 'Create a call',
@@ -16,6 +18,13 @@ export const createCallRouteOptions: RouteOptionsWithoutHandler = {
         type: 'object',
         properties: {
           message: { type: 'string' },
+        },
+      },
+      401: {
+        description: 'Authorization error',
+        type: 'object',
+        properties: {
+          message: { error: 'string' },
         },
       },
       500: {
