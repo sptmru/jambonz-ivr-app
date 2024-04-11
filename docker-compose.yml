@@ -3,6 +3,7 @@ version: '3.8'
 services:
   rabbitmq:
     image: 'rabbitmq:3.13-management'
+    restart: unless-stopped
     environment:
       RABBITMQ_ERLANG_COOKIE: 'SWQOKODSQALRPCLNMEQG'
       RABBITMQ_DEFAULT_USER: 'rabbitmq'
@@ -15,6 +16,7 @@ services:
       - '5672:5672'
   redis:
     image: redis/redis-stack-server:7.2.0-v10
+    restart: unless-stopped
     environment:
       REDIS_ARGS: '--requirepass lnasdoifna0asd'
     ports:
@@ -23,6 +25,23 @@ services:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
     volumes:
       - redis_data:/data
+  ivr-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ./docker-entrypoint.sh
+    restart: unless-stopped
+    ports:
+      - '${HTTP_PORT:-8080}:${HTTP_PORT:-8080}'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${HTTP_PORT}/api/v1/health']
+      interval: 5s
+      timeout: 15s
+      retries: 5
+      start_period: 3s
+    depends_on:
+      - rabbitmq
+      - redis
 
 volumes:
   rabbitmq_data: {}
