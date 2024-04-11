@@ -1,0 +1,49 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": ["./tsconfig.json"] },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": 2,
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/strict-boolean-expressions": 2,
+    "@typescript-eslint/no-unnecessary-condition": 2,
+    "@typescript-eslint/no-floating-promises": 2,
+    "@typescript-eslint/explicit-function-return-type": 2,
+    "@typescript-eslint/naming-convention": [
+      2,
+      {
+        "selector": "variable",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "function",
+        "format": ["camelCase", "PascalCase"]
+      },
+      {
+        "selector": "typeLike",
+        "format": ["PascalCase"]
+      }
+    ],
+    "arrow-body-style": [2, "as-needed"],
+    "no-nested-ternary": 2,
+    "max-params": [2, 3],
+    "require-await": 2,
+    "no-shadow": 2,
+    "complexity": 2,
+    "comma-dangle": [2, {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      "functions": "never"
+    }]
+  },
+  "ignorePatterns": ["build/*"]
+}

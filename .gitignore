@@ -1,0 +1,23 @@
+# Application files
+*.txt
+*.log
+.env
+build
+coverage
+node_modules
+
+# Folder view configuration files
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files
+._*
+Thumbs.db
+
+# IDE files
+.vscode/*
+!.vscode/launch.json
+.idea
+
+# Voicemail files
+voicemail-files/*
