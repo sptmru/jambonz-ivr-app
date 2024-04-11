@@ -2,8 +2,7 @@
 
 # Copy .env
 echo "Creating .env"
-cp .env.example build/.env
-cp .env.example .env
+cp .env build/.env
 
 # Start service
 echo "Starting app"
