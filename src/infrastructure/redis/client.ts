@@ -3,19 +3,32 @@ import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
 
+interface RedisConnectionObserver {
+  onRedisConnected: () => void;
+  onRedisDisconnected: () => void;
+}
+
 export class RedisClient {
   private static instance: RedisClient | null = null;
   private connection: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
+  private observers: RedisConnectionObserver[] = [];
 
   private constructor() {
     this.connection = createClient({ url: config.redis.uri });
 
     this.connection.on('connect', () => {
       logger.debug('Redis connection (re)established');
+      this.observers.forEach(observer => observer.onRedisConnected());
     });
 
     this.connection.on('error', err => {
       logger.error('Redis connection error', err);
+      this.observers.forEach(observer => observer.onRedisDisconnected());
+    });
+
+    this.connection.on('end', () => {
+      logger.debug('Redis connection closed');
+      this.observers.forEach(observer => observer.onRedisDisconnected());
     });
 
     void this.connection.connect();
@@ -26,6 +39,10 @@ export class RedisClient {
       RedisClient.instance = new RedisClient();
     }
     return RedisClient.instance;
+  }
+
+  public addObserver(observer: RedisConnectionObserver): void {
+    this.observers.push(observer);
   }
 
   async saveCallDetails(callId: string, details: CallDetails): Promise<void> {
