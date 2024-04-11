@@ -12,9 +12,12 @@ export class MQClient {
   private sub: Consumer;
 
   constructor() {
+    this.connect();
+  }
+
+  private connect(): void {
     this.connection = new Connection(config.rabbitmq.uri);
     this.connection.on('error', err => {
-      // TODO: handle error properly
       logger.error(`RabbitMQ connection error: ${err}`);
     });
     this.connection.on('connection', () => {
@@ -36,7 +39,6 @@ export class MQClient {
 
           await messageHandler(parsedMessage);
         } catch (err) {
-          // TODO: handle errors correctly, just pass for now if can't handle
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
         }
         return;
