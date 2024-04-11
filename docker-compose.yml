@@ -3,9 +3,9 @@ services:
     image: 'rabbitmq:3.13-management'
     restart: unless-stopped
     environment:
-      RABBITMQ_ERLANG_COOKIE: 'SWQOKODSQALRPCLNMEQG'
-      RABBITMQ_DEFAULT_USER: 'rabbitmq'
-      RABBITMQ_DEFAULT_PASS: 'rabbitmq'
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-SWQOKODSQALRPCLNMEQG}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-rabbitmq}
       RABBITMQ_DEFAULT_VHOST: '/'
     healthcheck:
       test: rabbitmq-diagnostics check_port_connectivity
@@ -21,7 +21,7 @@ services:
     image: redis/redis-stack-server:7.2.0-v10
     restart: unless-stopped
     environment:
-      REDIS_ARGS: '--requirepass lnasdoifna0asd'
+      REDIS_ARGS: '--requirepass ${REDIS_PASSWORD:-lnasdoifna0asd}'
     expose:
       - 6379
     healthcheck:
