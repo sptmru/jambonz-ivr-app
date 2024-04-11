@@ -41,7 +41,9 @@ export class CallbacksService {
       const dialTarget = callDetails.destinationAddress.includes('@')
         ? { type: 'user', name: callDetails.destinationAddress }
         : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
-      return jambonz.play({ url: callDetails.wavUrlContinue }).dial({ target: [dialTarget] });
+      return jambonz
+        .play({ url: callDetails.wavUrlContinue })
+        .dial({ target: [dialTarget], callerId: callDetails.numberFrom });
     }
 
     if (result.digits === callDetails?.digitOptOut) {
