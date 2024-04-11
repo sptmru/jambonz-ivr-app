@@ -12,6 +12,11 @@ export const createCallRouteOptions: RouteOptionsWithoutHandler = {
     body: {
       $ref: 'CallDetails#',
     },
+    security: [
+      {
+        ApiKeyAuth: [],
+      },
+    ],
     response: {
       200: {
         description: 'Call initiated successfully',

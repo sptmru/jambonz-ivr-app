@@ -29,7 +29,7 @@ export class Api {
     });
 
     /* eslint-disable @typescript-eslint/no-floating-promises */
-    this.app.register(fastifySwagger, swaggerOptions);
+    this.app.register(fastifySwagger, swaggerOptions as any);
     this.app.register(fastifySwaggerUi, swaggerUiOptions);
     /* eslint-enable @typescript-eslint/no-floating-promises */
 

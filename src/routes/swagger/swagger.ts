@@ -2,6 +2,7 @@ import { config } from '../../infrastructure/config/config';
 
 export const swaggerOptions = {
   openapi: {
+    openapi: '3.0.0',
     info: {
       title: 'IVR API',
       description: 'IVR API Documentation',
@@ -14,7 +15,15 @@ export const swaggerOptions = {
         url: config.api.hostname,
       },
     ],
-    components: {},
+    components: {
+      securitySchemes: {
+        ApiKeyAuth: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header',
+        },
+      },
+    },
     tags: [
       {
         name: 'calls',
