@@ -12,22 +12,26 @@ export class RedisClient {
   private static instance: RedisClient | null = null;
   private connection: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
   private observers: RedisConnectionObserver[] = [];
+  public isConnected: boolean = false;
 
   private constructor() {
     this.connection = createClient({ url: config.redis.uri });
 
     this.connection.on('connect', () => {
       logger.debug('Redis connection (re)established');
+      this.isConnected = true;
       this.observers.forEach(observer => observer.onRedisConnected());
     });
 
     this.connection.on('error', err => {
       logger.error('Redis connection error', err);
+      this.isConnected = false;
       this.observers.forEach(observer => observer.onRedisDisconnected());
     });
 
     this.connection.on('end', () => {
       logger.debug('Redis connection closed');
+      this.isConnected = false;
       this.observers.forEach(observer => observer.onRedisDisconnected());
     });
 
