@@ -6,6 +6,7 @@ import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
 import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
 import { VoslogicApiWrapper } from '../third-party/voslogic-api-wrapper.service';
+import { VoslogicApiDispositionEnum } from '../../domain/types/voslogic/dtmfpayload.type';
 
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
@@ -35,7 +36,7 @@ export class CallbacksService {
         transactionid: result.call_sid,
         from: callDetails.numberFrom as string,
         to: callDetails.numberTo as string,
-        Disposition: 'CONTINUE',
+        Disposition: VoslogicApiDispositionEnum.CONTINUE,
       });
       const dialTarget = callDetails.destinationAddress.includes('@')
         ? { type: 'user', name: callDetails.destinationAddress }
@@ -49,7 +50,7 @@ export class CallbacksService {
         transactionid: result.call_sid,
         from: callDetails.numberFrom as string,
         to: callDetails.numberTo as string,
-        Disposition: 'OPTOUT',
+        Disposition: VoslogicApiDispositionEnum.OPTOUT,
       });
       return jambonz.play({ url: callDetails.wavUrlOptOut });
     }
@@ -66,7 +67,7 @@ export class CallbacksService {
         transactionid: result.call_sid,
         from: callDetails?.numberFrom as string,
         to: callDetails?.numberTo as string,
-        Disposition: 'VM',
+        Disposition: VoslogicApiDispositionEnum.VM,
       });
       return jambonz.play({ url: callDetails?.wavUrlVM });
     }

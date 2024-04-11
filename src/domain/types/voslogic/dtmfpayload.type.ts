@@ -1,8 +1,13 @@
-export type VoslogicApiDispositionOptions = 'VM' | 'OPTOUT' | 'CONTINUE';
-
 export type VoslogicDtmfPayload = {
   transactionid: string;
   from: string;
   to: string;
-  Disposition: VoslogicApiDispositionOptions;
+  Disposition: VoslogicApiDispositionEnum;
 };
+
+// eslint-disable-next-line no-shadow
+export enum VoslogicApiDispositionEnum {
+  VM = 'VM',
+  OPTOUT = 'OPTOUT',
+  CONTINUE = 'CONTINUE',
+}
