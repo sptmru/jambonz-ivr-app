@@ -16,7 +16,7 @@ const api = new Api({
 
 api.listen();
 
-const mq = new MQClient();
+const mq = MQClient.getInstance();
 // eslint-disable-next-line require-await
 mq.consumeToQueue(config.rabbitmq.callsQueue, CallsService.createCall);
 

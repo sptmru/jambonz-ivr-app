@@ -14,10 +14,18 @@ export class MQClient {
   private queueName: string;
   private messageHandler: MessageHandler;
   private isConsuming: boolean = false;
+  private static instance: MQClient | null = null;
 
   constructor() {
     this.connect();
     RedisClient.getInstance().addObserver(this);
+  }
+
+  static getInstance(): MQClient {
+    if (!MQClient.instance) {
+      MQClient.instance = new MQClient();
+    }
+    return MQClient.instance;
   }
 
   private connect(): void {
