@@ -1,6 +1,6 @@
 export type IvrInitiateResult = {
   call_sid: string;
-  direction: 'inbound' | 'outbound';
+  direction: CallDirectionEnum;
   from: string;
   to: string;
   call_id: string;
@@ -16,3 +16,9 @@ export type IvrInitiateResult = {
   digits: string;
   reason: string;
 };
+
+// eslint-disable-next-line no-shadow
+export enum CallDirectionEnum {
+  INBOUND = 'inbound',
+  OUTBOUND = 'outbound',
+}
