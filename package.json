@@ -30,6 +30,7 @@
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "fastify": "^4.26.2",
+    "libphonenumber-js": "^1.10.60",
     "rabbitmq-client": "^4.5.3",
     "redis": "^4.6.13",
     "winston": "^3.13.0"
