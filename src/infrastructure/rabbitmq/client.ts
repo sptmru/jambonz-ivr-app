@@ -1,8 +1,9 @@
-import Connection, { Consumer } from 'rabbitmq-client';
+import Connection, { Consumer, Publisher } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
 import { RedisClient } from '../redis/client';
+import { CallStatus } from '../../domain/types/callstatus.type';
 
 interface MessageHandler {
   (param1: CallDetails): Promise<void>;
@@ -11,6 +12,7 @@ interface MessageHandler {
 export class MQClient {
   private connection: Connection;
   private sub: Consumer;
+  private pub: Publisher | null = null;
   private queueName: string;
   private messageHandler: MessageHandler;
   private isConsuming: boolean = false;
@@ -65,6 +67,7 @@ export class MQClient {
       logger.warn(`Already consuming from ${this.queueName}`);
       return;
     }
+
     this.sub = this.connection.createConsumer(
       {
         queue: queueName,
@@ -90,8 +93,26 @@ export class MQClient {
     });
   }
 
+  async publishToQueue(queueName: string, message: CallStatus): Promise<void> {
+    if (!this.pub) {
+      this.pub = this.connection.createPublisher({
+        confirm: true,
+        maxAttempts: 2,
+      });
+    }
+
+    logger.info(`Publishing call id ${message.call_sid} status to ${queueName})`);
+
+    try {
+      await this.pub.send(config.rabbitmq.callStatusQueue, message);
+    } catch (err) {
+      logger.error(`Error while publishing to ${queueName}: ${err}`);
+    }
+  }
+
   async onShutdown(): Promise<void> {
     await this.sub.close();
+    await this.pub?.close();
     await this.connection.close();
   }
 }
