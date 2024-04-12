@@ -8,7 +8,7 @@ export class PhoneNumberValidatorService {
     if (validatedNumber && validatedNumber.isValid()) {
       logger.info(`Phone number ${validatedNumber.number} is a valid ${validatedNumber.country} number`);
     } else {
-      logger.error(`Phone number ${phoneNumber} is not valid, considering that it is a SIP address`);
+      logger.info(`Phone number ${phoneNumber} is not valid, considering that it is a SIP address`);
     }
     return validatedNumber;
   }
