@@ -7,12 +7,12 @@ import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 export class CallsService {
   static async createCall(callDetails: CallDetails): Promise<void> {
     const phoneNumber = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberTo);
+    const destination =  phoneNumber 
+      ? { type: 'phone', number: phoneNumber.number, trunk: callDetails.carrierAddress } 
+      : { type: 'user', name: `${callDetails.numberTo}@${config.jambonz.sipRealm}` };
     const callId = await jambonz.calls.create({
       from: callDetails.numberFrom,
-      to: {
-        type: phoneNumber ? 'phone' : 'user',
-        name: phoneNumber ? phoneNumber.number : `${callDetails.numberTo}@${config.jambonz.sipRealm}`,
-      },
+      to: destination,
       application_sid: config.jambonz.applicationSid,
       amd: { actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback` },
     });
