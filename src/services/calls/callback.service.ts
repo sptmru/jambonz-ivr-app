@@ -27,7 +27,11 @@ export class CallbacksService {
   }
 
   static async dtmfCallback(result: DtmfResult): Promise<WebhookResponse> {
-    logger.info(`DTMF received on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.digits})`);
+    logger.info(
+      result.digits === undefined
+        ? `DTMF timeout on call ID ${result.call_sid} from ${result.from} to ${result.to}`
+        : `DTMF received on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.digits})`
+    );
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     const jambonz = new WebhookResponse();
 
@@ -60,7 +64,11 @@ export class CallbacksService {
       });
       return jambonz.play({ url: callDetails.wavUrlOptOut });
     }
-    logger.info(`Caller hangout on call ID ${result.call_sid} using digit ${result.digits}`);
+    logger.info(
+      result.digits === undefined
+        ? `Call ID ${result.call_sid} hangup due to DTMF timeout`
+        : `Call ID ${result.call_sid} hangup due to invalid DTMF value: ${result.digits}`
+    );
     return jambonz.hangup();
   }
 
