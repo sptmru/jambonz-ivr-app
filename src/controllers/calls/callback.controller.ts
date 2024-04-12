@@ -25,10 +25,7 @@ export class CallbacksController {
     reply: FastifyReply
   ): Promise<FastifyReply> {
     try {
-      const status = request.body;
-      logger.info(
-        `Status on call ID ${status.call_sid} from ${status.from} to ${status.to} — status: ${status.call_status} (code ${status.sip_status})`
-      );
+      CallbacksService.statusCallback(request.body);
       return await reply.code(200).send({ message: 'Call status logged' });
     } catch (err) {
       logger.error(`Error while logging call status in a callback: ${err.message}`);

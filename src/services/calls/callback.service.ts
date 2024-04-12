@@ -7,6 +7,8 @@ import { RedisClient } from '../../infrastructure/redis/client';
 import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
 import { VoslogicApiWrapper } from '../third-party/voslogic-api-wrapper.service';
 import { VoslogicApiDispositionEnum } from '../../domain/types/voslogic/dtmfpayload.type';
+import { CallStatus } from '../../domain/types/callstatus.type';
+import { MQClient } from '../../infrastructure/rabbitmq/client';
 
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
@@ -97,5 +99,13 @@ export class CallbacksService {
       });
       return jambonz.play({ url: callDetails.wavUrlVM });
     }
+  }
+
+  static statusCallback(result: CallStatus): void {
+    logger.info(
+      `Status on call ID ${result.call_sid} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`
+    );
+    const mq = MQClient.getInstance();
+    void mq.publishToQueue(config.rabbitmq.callStatusQueue, result);
   }
 }
