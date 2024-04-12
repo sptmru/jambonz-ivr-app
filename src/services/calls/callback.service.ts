@@ -9,6 +9,7 @@ import { VoslogicApiWrapper } from '../third-party/voslogic-api-wrapper.service'
 import { VoslogicApiDispositionEnum } from '../../domain/types/voslogic/dtmfpayload.type';
 import { CallStatus } from '../../domain/types/callstatus.type';
 import { MQClient } from '../../infrastructure/rabbitmq/client';
+import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
@@ -56,12 +57,22 @@ export class CallbacksService {
       logger.info(
         `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
       );
+      const validatedInitialDestination = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberTo);
+      const validatedInitialCallerId = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberFrom);
+
+      // eslint-disable-next-line no-nested-ternary
+      const callerId = validatedInitialDestination
+        ? validatedInitialDestination.number
+        : validatedInitialCallerId
+          ? validatedInitialCallerId.number
+          : undefined;
       const dialTarget = callDetails.destinationAddress.includes('@')
         ? { type: 'user', name: callDetails.destinationAddress }
         : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
-      return jambonz
-        .play({ url: callDetails.wavUrlContinue })
-        .dial({ target: [dialTarget], callerId: callDetails.numberTo });
+      return jambonz.play({ url: callDetails.wavUrlContinue }).dial({
+        target: [dialTarget],
+        callerId,
+      });
     }
 
     if (result.digits === callDetails.digitOptOut) {
