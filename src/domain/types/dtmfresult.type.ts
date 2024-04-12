@@ -15,6 +15,6 @@ export type DtmfResult = {
   fs_sip_address: string;
   api_base_url: string;
   fs_public_api: string;
-  digits: string;
+  digits?: string;
   reason: string;
 };
