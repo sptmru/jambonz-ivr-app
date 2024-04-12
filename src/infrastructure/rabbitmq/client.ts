@@ -101,7 +101,7 @@ export class MQClient {
       });
     }
 
-    logger.info(`Publishing call id ${message.call_sid} status to ${queueName})`);
+    logger.info(`Publishing call id ${message.call_sid} status to ${queueName}`);
 
     try {
       await this.pub.send(config.rabbitmq.callStatusQueue, message);
