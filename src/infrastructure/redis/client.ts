@@ -53,6 +53,10 @@ export class RedisClient {
     await this.connection.set(callId, JSON.stringify(details));
   }
 
+  async deleteCallDetails(callId: string): Promise<void> {
+    await this.connection.del(callId);
+  }
+
   async getCallObject(callId: string): Promise<CallDetails | null> {
     try {
       const data = await this.connection.get(callId);
