@@ -19,6 +19,7 @@ export class CallbacksService {
       input: ['digits'],
       maxDigits: 1,
       numDigits: 1,
+      timeout: config.calls.dtmfGatherTimeout,
       play: {
         url: callDetails?.wavUrlAnnounce,
       },

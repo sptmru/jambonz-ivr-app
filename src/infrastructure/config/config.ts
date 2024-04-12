@@ -38,4 +38,7 @@ export const config = {
           : 'http://vos-api.voslogic.com/api',
     },
   },
+  calls: {
+    dtmfGatherTimeout: parsedConfig?.DTMF_GATHER_TIMEOUT != null ? Number(parsedConfig.DTMF_GATHER_TIMEOUT) : 15,
+  },
 };
