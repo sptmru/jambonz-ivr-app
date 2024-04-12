@@ -34,25 +34,25 @@ export class MQClient {
       logger.error(`RabbitMQ connection error: ${err}`);
     });
     this.connection.on('connection', () => {
-      logger.debug('RabbitMQ connection (re)established');
+      logger.info('RabbitMQ connection (re)established');
     });
   }
 
   onRedisConnected(): void {
     if (this.isConsuming) {
-      logger.debug(`Already consuming from ${this.queueName}`);
+      logger.info(`Already consuming from ${this.queueName}`);
       return;
     }
-    logger.debug(`Redis connection is reestablished, resuming RabbitMQ message consumption`);
+    logger.info(`Redis connection is reestablished, resuming RabbitMQ message consumption`);
     this.consumeToQueue(this.queueName, this.messageHandler);
   }
 
   onRedisDisconnected(): void {
     if (!this.isConsuming) {
-      logger.debug(`Not consuming from ${this.queueName}`);
+      logger.info(`Not consuming from ${this.queueName}`);
       return;
     }
-    logger.debug(`Redis connection is lost, stopping RabbitMQ message consumption`);
+    logger.info(`Redis connection is lost, stopping RabbitMQ message consumption`);
     void this.sub.close();
     this.isConsuming = false;
   }
@@ -74,7 +74,7 @@ export class MQClient {
       async msg => {
         try {
           const parsedMessage = JSON.parse(msg.body);
-          logger.debug(`Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`);
+          logger.info(`Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`);
 
           await messageHandler(parsedMessage);
         } catch (err) {

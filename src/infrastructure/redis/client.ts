@@ -18,7 +18,7 @@ export class RedisClient {
     this.connection = createClient({ url: config.redis.uri });
 
     this.connection.on('connect', () => {
-      logger.debug('Redis connection (re)established');
+      logger.info('Redis connection (re)established');
       this.isConnected = true;
       this.observers.forEach(observer => observer.onRedisConnected());
     });
@@ -30,7 +30,7 @@ export class RedisClient {
     });
 
     this.connection.on('end', () => {
-      logger.debug('Redis connection closed');
+      logger.info('Redis connection closed');
       this.isConnected = false;
       this.observers.forEach(observer => observer.onRedisDisconnected());
     });

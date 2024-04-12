@@ -11,7 +11,7 @@ import { VoslogicApiDispositionEnum } from '../../domain/types/voslogic/dtmfpayl
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
-    logger.debug(`Starting IVR on call ID ${result.call_sid} from ${result.from} to ${result.to})`);
+    logger.info(`Starting IVR on call ID ${result.call_sid} from ${result.from} to ${result.to})`);
 
     const jambonz = new WebhookResponse();
     return jambonz.pause({ length: 1 }).gather({
@@ -26,19 +26,19 @@ export class CallbacksService {
   }
 
   static async dtmfCallback(result: DtmfResult): Promise<WebhookResponse> {
-    logger.debug(`DTMF received on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.digits})`);
+    logger.info(`DTMF received on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.digits})`);
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     const jambonz = new WebhookResponse();
 
     if (result.digits === callDetails?.digitContinue) {
-      logger.debug(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
+      logger.info(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
       await VoslogicApiWrapper.sendTransactionData({
         transactionid: result.call_sid,
         from: callDetails.numberFrom as string,
         to: callDetails.numberTo as string,
         Disposition: VoslogicApiDispositionEnum.CONTINUE,
       });
-      logger.debug(
+      logger.info(
         `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
       );
       const dialTarget = callDetails.destinationAddress.includes('@')
@@ -50,7 +50,7 @@ export class CallbacksService {
     }
 
     if (result.digits === callDetails?.digitOptOut) {
-      logger.debug(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
+      logger.info(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
       await VoslogicApiWrapper.sendTransactionData({
         transactionid: result.call_sid,
         from: callDetails.numberFrom as string,
@@ -59,12 +59,12 @@ export class CallbacksService {
       });
       return jambonz.play({ url: callDetails.wavUrlOptOut });
     }
-    logger.debug(`Caller hangout on call ID ${result.call_sid} using digit ${result.digits}`);
+    logger.info(`Caller hangout on call ID ${result.call_sid} using digit ${result.digits}`);
     return jambonz.hangup();
   }
 
   static async amdCallback(result: AmdResult): Promise<WebhookResponse> {
-    logger.debug(`AMD on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.type})`);
+    logger.info(`AMD on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.type})`);
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     const jambonz = new WebhookResponse();
     if (result.type === AmdResultEnum.MACHINE) {
