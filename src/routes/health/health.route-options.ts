@@ -6,13 +6,20 @@ export const healthGetRouteOptions: RouteOptionsWithoutHandler = {
   schema: {
     tags: ['monitoring'],
     description: 'A healthcheck endpoint. Returns 200 if the API is alive, returns nothing if it is not',
-    summary: 'Healtcheck endpoint',
+    summary: 'Healthcheck endpoint',
     response: {
       200: {
         description: 'Successful response',
         type: 'object',
         properties: {
           message: { type: 'string' },
+        },
+      },
+      500: {
+        description: 'Unsuccessful response',
+        type: 'object',
+        properties: {
+          error: { type: 'string' },
         },
       },
     },

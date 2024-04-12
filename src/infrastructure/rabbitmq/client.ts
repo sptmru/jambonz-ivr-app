@@ -16,6 +16,7 @@ export class MQClient {
   private queueName: string;
   private messageHandler: MessageHandler;
   private isConsuming: boolean = false;
+  public isConnected: boolean = false;
   private static instance: MQClient | null = null;
 
   constructor() {
@@ -33,9 +34,11 @@ export class MQClient {
   private connect(): void {
     this.connection = new Connection(config.rabbitmq.uri);
     this.connection.on('error', err => {
+      this.isConnected = false;
       logger.error(`RabbitMQ connection error: ${err}`);
     });
     this.connection.on('connection', () => {
+      this.isConnected = true;
       logger.info('RabbitMQ connection (re)established');
     });
   }
