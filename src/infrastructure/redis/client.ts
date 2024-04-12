@@ -50,14 +50,17 @@ export class RedisClient {
   }
 
   async saveCallDetails(callId: string, details: CallDetails): Promise<void> {
+    logger.info(`Saving call details for call ID ${callId}`);
     await this.connection.set(callId, JSON.stringify(details));
   }
 
   async deleteCallDetails(callId: string): Promise<void> {
+    logger.info(`Deleting call details for call ID ${callId}`);
     await this.connection.del(callId);
   }
 
   async getCallObject(callId: string): Promise<CallDetails | null> {
+    logger.info(`Retrieving call details for call ID ${callId}`);
     try {
       const data = await this.connection.get(callId);
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
