@@ -10,6 +10,7 @@ import { VoslogicApiDispositionEnum } from '../../domain/types/voslogic/dtmfpayl
 import { CallStatus } from '../../domain/types/callstatus.type';
 import { MQClient } from '../../infrastructure/rabbitmq/client';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
+import { CallDetails } from '../../domain/types/calldetails.type';
 
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
@@ -33,6 +34,57 @@ export class CallbacksService {
     });
   }
 
+  private static async ivrContinue(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
+    logger.info(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
+    await VoslogicApiWrapper.sendTransactionData({
+      transactionid: result.call_sid,
+      from: callDetails.numberFrom as string,
+      to: callDetails.numberTo as string,
+      Disposition: VoslogicApiDispositionEnum.CONTINUE,
+    });
+    logger.info(
+      `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
+    );
+    const validatedInitialDestination = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberTo);
+    const validatedInitialCallerId = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberFrom);
+
+    // eslint-disable-next-line no-nested-ternary
+    const callerId = validatedInitialDestination
+      ? validatedInitialDestination.number
+      : validatedInitialCallerId
+        ? validatedInitialCallerId.number
+        : undefined;
+    const dialTarget = callDetails.destinationAddress.includes('@')
+      ? { type: 'user', name: callDetails.destinationAddress }
+      : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
+
+    return new WebhookResponse().play({ url: callDetails.wavUrlContinue }).dial({
+      target: [dialTarget],
+      callerId,
+    });
+  }
+
+  private static async ivrOptOut(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
+    logger.info(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
+    await VoslogicApiWrapper.sendTransactionData({
+      transactionid: result.call_sid,
+      from: callDetails.numberFrom as string,
+      to: callDetails.numberTo as string,
+      Disposition: VoslogicApiDispositionEnum.OPTOUT,
+    });
+
+    return new WebhookResponse().play({ url: callDetails.wavUrlOptOut }).hangup();
+  }
+
+  private static ivrHangup(result: DtmfResult): Promise<WebhookResponse> {
+    logger.info(
+      result.digits === undefined
+        ? `Call ID ${result.call_sid} hangup due to DTMF timeout`
+        : `Call ID ${result.call_sid} hangup due to invalid DTMF value: ${result.digits}`
+    );
+    return new WebhookResponse().hangup();
+  }
+
   static async dtmfCallback(result: DtmfResult): Promise<WebhookResponse> {
     logger.info(
       result.digits === undefined
@@ -44,53 +96,17 @@ export class CallbacksService {
       logger.error(`Call ID ${result.call_sid} not found in Redis`);
       return new WebhookResponse().hangup();
     }
-    const jambonz = new WebhookResponse();
 
-    if (result.digits === callDetails.digitContinue) {
-      logger.info(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
-      await VoslogicApiWrapper.sendTransactionData({
-        transactionid: result.call_sid,
-        from: callDetails.numberFrom as string,
-        to: callDetails.numberTo as string,
-        Disposition: VoslogicApiDispositionEnum.CONTINUE,
-      });
-      logger.info(
-        `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
-      );
-      const validatedInitialDestination = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberTo);
-      const validatedInitialCallerId = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberFrom);
+    switch (result.digits) {
+      case callDetails.digitContinue:
+        return CallbacksService.ivrContinue(result, callDetails);
 
-      // eslint-disable-next-line no-nested-ternary
-      const callerId = validatedInitialDestination
-        ? validatedInitialDestination.number
-        : validatedInitialCallerId
-          ? validatedInitialCallerId.number
-          : undefined;
-      const dialTarget = callDetails.destinationAddress.includes('@')
-        ? { type: 'user', name: callDetails.destinationAddress }
-        : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
-      return jambonz.play({ url: callDetails.wavUrlContinue }).dial({
-        target: [dialTarget],
-        callerId,
-      });
+      case callDetails.digitOptOut:
+        return CallbacksService.ivrOptOut(result, callDetails);
+
+      default:
+        return CallbacksService.ivrHangup(result);
     }
-
-    if (result.digits === callDetails.digitOptOut) {
-      logger.info(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
-      await VoslogicApiWrapper.sendTransactionData({
-        transactionid: result.call_sid,
-        from: callDetails.numberFrom as string,
-        to: callDetails.numberTo as string,
-        Disposition: VoslogicApiDispositionEnum.OPTOUT,
-      });
-      return jambonz.play({ url: callDetails.wavUrlOptOut });
-    }
-    logger.info(
-      result.digits === undefined
-        ? `Call ID ${result.call_sid} hangup due to DTMF timeout`
-        : `Call ID ${result.call_sid} hangup due to invalid DTMF value: ${result.digits}`
-    );
-    return jambonz.hangup();
   }
 
   static async amdCallback(result: AmdResult): Promise<WebhookResponse> {
