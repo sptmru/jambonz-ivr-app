@@ -46,7 +46,7 @@ export class CallbacksService {
         : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
       return jambonz
         .play({ url: callDetails.wavUrlContinue })
-        .dial({ target: [dialTarget], callerId: callDetails.numberFrom });
+        .dial({ target: [dialTarget], callerId: callDetails.numberTo });
     }
 
     if (result.digits === callDetails?.digitOptOut) {
