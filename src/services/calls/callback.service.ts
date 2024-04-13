@@ -116,9 +116,13 @@ export class CallbacksService {
     }
 
     if (!isAmdMachine(result.type)) {
+      logger.info(`AMD result on call ID ${result.call_sid} is not a machine, getting out of the AMD handler`);
       return new WebhookResponse();
     }
 
+    logger.info(
+      `AMD detected on call ID ${result.call_sid}, playing VM message and hanging up (URL: ${callDetails.wavUrlVM})`
+    );
     await VoslogicApiWrapper.sendTransactionData({
       transactionid: result.call_sid,
       from: callDetails.numberFrom as string,
