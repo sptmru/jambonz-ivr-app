@@ -11,6 +11,7 @@ import { CallStatus } from '../../domain/types/callstatus.type';
 import { MQClient } from '../../infrastructure/rabbitmq/client';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 import { CallDetails } from '../../domain/types/calldetails.type';
+import { CallsService } from './calls.service';
 
 export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
@@ -54,10 +55,7 @@ export class CallbacksService {
       : validatedInitialCallerId
         ? validatedInitialCallerId.number
         : undefined;
-    const dialTarget = callDetails.destinationAddress.includes('@')
-      ? { type: 'user', name: callDetails.destinationAddress }
-      : { type: 'phone', number: callDetails.destinationAddress, trunk: callDetails.carrierAddress };
-
+    const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails);
     return new WebhookResponse().play({ url: callDetails.wavUrlContinue }).dial({
       target: [dialTarget],
       callerId,
