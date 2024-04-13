@@ -38,7 +38,10 @@ export class CallsService {
       from: callDetails.numberFrom,
       to: CallsService.prepareCallDestination(callDetails.numberTo, callDetails),
       application_sid: config.jambonz.applicationSid,
-      amd: { actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback` },
+      amd: {
+        actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
+        thresholdWordCount: config.jambonz.amd.thresholdWordCount,
+      },
     });
     await RedisClient.getInstance().saveCallDetails(callId, callDetails);
   }

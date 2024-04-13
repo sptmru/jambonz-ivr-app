@@ -36,6 +36,10 @@ export const config = {
     applicationSid: parsedConfig?.JAMBONZ_APPLICATION_SID != null ? parsedConfig.JAMBONZ_APPLICATION_SID : '1',
     baseUrl: parsedConfig?.JAMBONZ_BASE_URL != null ? parsedConfig.JAMBONZ_BASE_URL : 'https://api.jambonz.cloud',
     sipRealm: parsedConfig?.JAMBONZ_SIP_REALM != null ? parsedConfig.JAMBONZ_SIP_REALM : 'sip.jambonz.cloud',
+    amd: {
+      thresholdWordCount:
+        parsedConfig?.JAMBONZ_AMD_THRESHOLD_WORD_COUNT != null ? parsedConfig.JAMBONZ_AMD_THRESHOLD_WORD_COUNT : 9,
+    },
     callbackBaseUrl:
       parsedConfig?.JAMBONZ_CALLBACK_BASE_URL != null
         ? parsedConfig.JAMBONZ_CALLBACK_BASE_URL
