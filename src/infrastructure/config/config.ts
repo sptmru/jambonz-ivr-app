@@ -10,6 +10,7 @@ export const config = {
       parsedConfig?.SENTRY_TRACES_SAMPLE_RATE != null ? Number(parsedConfig.SENTRY_TRACES_SAMPLE_RATE) : 1.0,
     profilesSampleRate:
       parsedConfig?.SENTRY_PROFILES_SAMPLE_RATE != null ? Number(parsedConfig.SENTRY_PROFILES_SAMPLE_RATE) : 1.0,
+    logLevel: parsedConfig?.SENTRY_LOG_LEVEL != null ? parsedConfig.SENTRY_LOG_LEVEL : 'error',
   },
   api: {
     port: parsedConfig?.HTTP_PORT != null ? Number(parsedConfig.HTTP_PORT) : 3000,
