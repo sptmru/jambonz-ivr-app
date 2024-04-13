@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
-import newrelic from 'newrelic';
-
 import { CallDetailsDefinition } from './domain/definitions/calldetails.definition';
 import { Api } from './infrastructure/api/server';
 import { config } from './infrastructure/config/config';
@@ -12,7 +10,6 @@ import { CallbacksRoute } from './routes/callback/callback.route';
 import { CallsRoute } from './routes/calls/calls.route';
 import { HealthRoute } from './routes/health/health.route';
 import { CallsService } from './services/calls/calls.service';
-import { logger } from './misc/Logger';
 
 Sentry.init({
   dsn: config.sentry.dsn,
@@ -20,8 +17,6 @@ Sentry.init({
   tracesSampleRate: config.sentry.tracesSampleRate,
   profilesSampleRate: config.sentry.profilesSampleRate,
 });
-
-logger.debug(newrelic);
 
 const api = new Api({
   plugins: [],
