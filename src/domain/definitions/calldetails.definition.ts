@@ -1,3 +1,13 @@
+export const SipAuthData = {
+  $id: 'SipAuthData',
+  type: 'object',
+  required: [],
+  properties: {
+    username: { type: 'string' },
+    password: { type: 'string' },
+  },
+};
+
 export const CallDetailsDefinition = {
   $id: 'CallDetails',
   type: 'object',
@@ -26,5 +36,6 @@ export const CallDetailsDefinition = {
     destinationAddress: { type: 'string' },
     digitContinue: { type: 'string' },
     digitOptOut: { type: 'string' },
+    sipAuthData: { $ref: 'SipAuthData#' },
   },
 };

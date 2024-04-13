@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
-import { CallDetailsDefinition } from './domain/definitions/calldetails.definition';
+import { CallDetailsDefinition, SipAuthDataDefinition } from './domain/definitions/calldetails.definition';
 import { Api } from './infrastructure/api/server';
 import { config } from './infrastructure/config/config';
 import { MQClient } from './infrastructure/rabbitmq/client';
@@ -21,7 +21,7 @@ Sentry.init({
 const api = new Api({
   plugins: [],
   routes: [HealthRoute, CallsRoute, CallbacksRoute],
-  definitions: [CallDetailsDefinition],
+  definitions: [CallDetailsDefinition, SipAuthDataDefinition],
 });
 
 api.listen();
