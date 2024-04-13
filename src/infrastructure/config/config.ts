@@ -4,6 +4,13 @@ const parsedConfig = dotenv.config().parsed;
 
 export const config = {
   logLevel: parsedConfig?.LOG_LEVEL != null ? parsedConfig.LOG_LEVEL : 'debug',
+  sentry: {
+    dsn: parsedConfig?.SENTRY_DSN != null ? parsedConfig.SENTRY_DSN : 'https://1.ingest.us.sentry.io/1',
+    tracesSampleRate:
+      parsedConfig?.SENTRY_TRACES_SAMPLE_RATE != null ? Number(parsedConfig.SENTRY_TRACES_SAMPLE_RATE) : 1.0,
+    profilesSampleRate:
+      parsedConfig?.SENTRY_PROFILES_SAMPLE_RATE != null ? Number(parsedConfig.SENTRY_PROFILES_SAMPLE_RATE) : 1.0,
+  },
   api: {
     port: parsedConfig?.HTTP_PORT != null ? Number(parsedConfig.HTTP_PORT) : 3000,
     hostname: parsedConfig?.HTTP_HOSTNAME != null ? parsedConfig.HTTP_HOSTNAME : 'http://localhost',
