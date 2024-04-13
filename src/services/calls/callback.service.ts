@@ -1,6 +1,6 @@
 import { WebhookResponse } from '@jambonz/node-client';
 import { logger } from '../../misc/Logger';
-import { AmdResult, AmdResultEnum } from '../../domain/types/amdresult.type';
+import { AmdResult, isAmdMachine } from '../../domain/types/amdresult.type';
 import { config } from '../../infrastructure/config/config';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
@@ -116,16 +116,18 @@ export class CallbacksService {
       logger.error(`Call ID ${result.call_sid} not found in Redis`);
       return new WebhookResponse().hangup();
     }
-    const jambonz = new WebhookResponse();
-    if (result.type === AmdResultEnum.MACHINE) {
-      await VoslogicApiWrapper.sendTransactionData({
-        transactionid: result.call_sid,
-        from: callDetails.numberFrom as string,
-        to: callDetails.numberTo as string,
-        Disposition: VoslogicApiDispositionEnum.VM,
-      });
-      return jambonz.play({ url: callDetails.wavUrlVM });
+
+    if (!isAmdMachine(result.type)) {
+      return new WebhookResponse();
     }
+
+    await VoslogicApiWrapper.sendTransactionData({
+      transactionid: result.call_sid,
+      from: callDetails.numberFrom as string,
+      to: callDetails.numberTo as string,
+      Disposition: VoslogicApiDispositionEnum.VM,
+    });
+    return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
   }
 
   static statusCallback(result: CallStatus): void {
