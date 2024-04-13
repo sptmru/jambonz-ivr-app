@@ -31,7 +31,17 @@ export enum AmdResultEnum {
   DETECTION_STOPPED = 'amd_stopped',
 }
 
-export type AmdMachine = AmdResultEnum.MACHINE | AmdResultEnum.MACHINE_STOPPED | AmdResultEnum.BEEP;
-
+export type AmdMachine = Exclude<
+  AmdResultEnum,
+  | AmdResultEnum.HUMAN
+  | AmdResultEnum.MACHINE_STOPPED
+  | AmdResultEnum.DETECTION_STOPPED
+  | AmdResultEnum.ERROR
+  | AmdResultEnum.DECISION_TIMEOUT
+>;
 export const isAmdMachine = (value: string): value is AmdMachine =>
-  value === AmdResultEnum.MACHINE || value === AmdResultEnum.MACHINE_STOPPED || value === AmdResultEnum.BEEP;
+  value !== AmdResultEnum.HUMAN &&
+  value !== AmdResultEnum.MACHINE_STOPPED &&
+  value !== AmdResultEnum.DETECTION_STOPPED &&
+  value !== AmdResultEnum.DECISION_TIMEOUT &&
+  value !== AmdResultEnum.ERROR;
