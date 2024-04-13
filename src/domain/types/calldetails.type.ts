@@ -1,3 +1,5 @@
+export type SipAuthData = undefined | { username?: string; password?: string };
+
 export type CallDetails = {
   numberTo: string;
   numberFrom: string;
@@ -10,4 +12,5 @@ export type CallDetails = {
   destinationAddress: string;
   digitContinue: string;
   digitOptOut: string;
+  sipAuthData?: SipAuthData;
 };
