@@ -1,6 +1,5 @@
 import * as winston from 'winston';
 import Sentry from 'winston-transport-sentry-node';
-import logdnaWinston from 'logdna-winston';
 
 import { config } from '../infrastructure/config/config';
 
@@ -17,21 +16,11 @@ const sentryOptions = {
   level: config.sentry.logLevel,
 };
 
-const logDnaOptions = {
-  key: config.logDna.key,
-  hostname: config.logDna.hostname,
-  app: config.logDna.app,
-  env: config.logDna.env,
-  level: config.logDna.logLevel,
-  indexMeta: true,
-  handleExceptions: true,
-};
-
 const logger = winston.createLogger({
   level: config.logLevel,
   format: timestampFormat,
   defaultMeta: {},
-  transports: [new winston.transports.Console(), new Sentry(sentryOptions), new logdnaWinston(logDnaOptions)],
+  transports: [new winston.transports.Console(), new Sentry(sentryOptions)],
 });
 
 export { logger };
