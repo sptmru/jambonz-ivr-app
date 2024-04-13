@@ -1,4 +1,4 @@
-export const SipAuthData = {
+export const SipAuthDataDefinition = {
   $id: 'SipAuthData',
   type: 'object',
   required: [],
