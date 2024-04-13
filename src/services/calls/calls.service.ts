@@ -47,11 +47,7 @@ export class CallsService {
           toneTimeoutMs: config.jambonz.amd.timers.toneTimeoutMs,
           greetingCompletionTimeoutMs: config.jambonz.amd.timers.greetingCompletionTimeoutMs,
         },
-        recognizer: {
-          vad: {
-            enable: config.jambonz.recognizer.vad.enable,
-          },
-        },
+        recognizer: {},
       },
     });
     await RedisClient.getInstance().saveCallDetails(callId, callDetails);
