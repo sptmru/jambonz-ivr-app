@@ -27,12 +27,15 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^3.0.0",
     "@jambonz/node-client": "^0.3.74",
+    "@sentry/node": "^7.110.0",
+    "@sentry/profiling-node": "^7.110.0",
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "fastify": "^4.26.2",
     "libphonenumber-js": "^1.10.60",
     "rabbitmq-client": "^4.5.3",
     "redis": "^4.6.13",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "winston-transport-sentry-node": "^2.7.1"
   }
 }
