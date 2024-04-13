@@ -12,6 +12,13 @@ export const config = {
       parsedConfig?.SENTRY_PROFILES_SAMPLE_RATE != null ? Number(parsedConfig.SENTRY_PROFILES_SAMPLE_RATE) : 1.0,
     logLevel: parsedConfig?.SENTRY_LOG_LEVEL != null ? parsedConfig.SENTRY_LOG_LEVEL : 'error',
   },
+  logDna: {
+    key: parsedConfig?.LOGDNA_KEY != null ? parsedConfig.LOGDNA_KEY : 'key',
+    hostname: parsedConfig?.LOGDNA_HOSTNAME != null ? parsedConfig.LOGDNA_HOSTNAME : 'ivr-app.sptm.space',
+    app: parsedConfig?.LOGDNA_APP_NAME != null ? parsedConfig.LOGDNA_APP_NAME : 'jambonz-ivr-app',
+    env: parsedConfig?.LOGDNA_ENV_NAME != null ? parsedConfig.LOGDNA_ENV_NAME : 'production',
+    logLevel: parsedConfig?.LOGDNA_LOG_LEVEL != null ? parsedConfig.LOGDNA_LOG_LEVEL : 'info',
+  },
   api: {
     port: parsedConfig?.HTTP_PORT != null ? Number(parsedConfig.HTTP_PORT) : 3000,
     hostname: parsedConfig?.HTTP_HOSTNAME != null ? parsedConfig.HTTP_HOSTNAME : 'http://localhost',
