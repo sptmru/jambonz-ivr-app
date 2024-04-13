@@ -20,11 +20,13 @@ const logger = winston.createLogger({
   level: config.log.level,
   format: timestampFormat,
   defaultMeta: {},
-  transports: [new winston.transports.Console(), new Sentry(sentryOptions)],
+  transports: config.log.logToFile
+    ? [
+        new winston.transports.Console(),
+        new Sentry(sentryOptions),
+        new winston.transports.File({ filename: `${config.log.directory}/${config.log.file}` }),
+      ]
+    : [new winston.transports.Console(), new Sentry(sentryOptions)],
 });
-
-if (config.log.logToFile) {
-  logger.add(new winston.transports.File({ filename: `${config.log.directory}/${config.log.file}` }));
-}
 
 export { logger };
