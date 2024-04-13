@@ -1,6 +1,7 @@
 # Application files
 *.txt
 *.log
+logs
 .env
 build
 coverage
@@ -19,7 +20,5 @@ Thumbs.db
 !.vscode/launch.json
 .idea
 
-# Voicemail files
-voicemail-files/*
 # Sentry Config File
 .sentryclirc

@@ -3,7 +3,12 @@ import * as dotenv from 'dotenv';
 const parsedConfig = dotenv.config().parsed;
 
 export const config = {
-  logLevel: parsedConfig?.LOG_LEVEL != null ? parsedConfig.LOG_LEVEL : 'debug',
+  log: {
+    level: parsedConfig?.LOG_LEVEL != null ? parsedConfig.LOG_LEVEL : 'debug',
+    directory: parsedConfig?.LOG_DIRECTORY != null ? parsedConfig.LOG_DIRECTORY : './logs',
+    file: `${parsedConfig?.LOG_LEVEL != null ? parsedConfig.LOG_LEVEL : 'debug'}.log`,
+    logToFile: parsedConfig?.LOG_TO_FILE != null ? parsedConfig.LOG_TO_FILE.toLowerCase() === 'true' : false,
+  },
   sentry: {
     dsn: parsedConfig?.SENTRY_DSN != null ? parsedConfig.SENTRY_DSN : 'https://1.ingest.us.sentry.io/1',
     tracesSampleRate:
