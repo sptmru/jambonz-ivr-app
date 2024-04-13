@@ -21,3 +21,5 @@ Thumbs.db
 
 # Voicemail files
 voicemail-files/*
+# Sentry Config File
+.sentryclirc

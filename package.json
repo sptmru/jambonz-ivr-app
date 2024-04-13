@@ -7,11 +7,12 @@
     "start": "ts-node --swc src/app.ts",
     "start:dev": "ts-node-dev --respawn src/app.ts",
     "start:prod": "cd build && node app.js",
-    "build": "tsc",
+    "build": "tsc && npm run sentry:sourcemaps",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint --fix --ext .ts",
-    "format": "prettier --write \"**/*.{js,ts}\""
+    "format": "prettier --write \"**/*.{js,ts}\"",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org sptm --project ivr-app ./build && sentry-cli sourcemaps upload --org sptm --project ivr-app ./build"
   },
   "author": "Soslan Aldatov <soslanaldatov@gmail.com>",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^3.0.0",
     "@jambonz/node-client": "^0.3.74",
+    "@sentry/cli": "^2.31.0",
     "@sentry/node": "^7.110.0",
     "@sentry/profiling-node": "^7.110.0",
     "axios": "^1.6.8",
