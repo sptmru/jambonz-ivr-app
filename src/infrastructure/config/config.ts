@@ -38,7 +38,33 @@ export const config = {
     sipRealm: parsedConfig?.JAMBONZ_SIP_REALM != null ? parsedConfig.JAMBONZ_SIP_REALM : 'sip.jambonz.cloud',
     amd: {
       thresholdWordCount:
-        parsedConfig?.JAMBONZ_AMD_THRESHOLD_WORD_COUNT != null ? parsedConfig.JAMBONZ_AMD_THRESHOLD_WORD_COUNT : 9,
+        parsedConfig?.JAMBONZ_AMD_THRESHOLD_WORD_COUNT != null
+          ? Number(parsedConfig.JAMBONZ_AMD_THRESHOLD_WORD_COUNT)
+          : 9,
+      timers: {
+        noSpeechTimeoutMs:
+          parsedConfig?.JAMBONZ_AMD_NO_SPEECH_TIMEOUT != null
+            ? Number(parsedConfig.JAMBONZ_AMD_NO_SPEECH_TIMEOUT)
+            : 5000,
+        decisionTimeoutMs:
+          parsedConfig?.JAMBONZ_AMD_DECISION_TIMEOUT != null
+            ? Number(parsedConfig.JAMBONZ_AMD_DECISION_TIMEOUT)
+            : 15000,
+        toneTimeoutMs:
+          parsedConfig?.JAMBONZ_AMD_TONE_TIMEOUT != null ? Number(parsedConfig.JAMBONZ_AMD_TONE_TIMEOUT) : 20000,
+        greetingCompletionTimeoutMs:
+          parsedConfig?.JAMBONZ_AMD_GREETING_COMPLETION_TIMEOUT != null
+            ? Number(parsedConfig.JAMBONZ_AMD_GREETING_COMPLETION_TIMEOUT)
+            : 2000,
+      },
+    },
+    recognizer: {
+      vad: {
+        enable:
+          parsedConfig?.JAMBONZ_RECOGNIZER_VAD_ENABLE != null
+            ? parsedConfig.JAMBONZ_RECOGNIZER_VAD_ENABLE.toLowerCase() === 'true'
+            : false,
+      },
     },
     callbackBaseUrl:
       parsedConfig?.JAMBONZ_CALLBACK_BASE_URL != null

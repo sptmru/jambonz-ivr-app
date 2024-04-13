@@ -41,6 +41,17 @@ export class CallsService {
       amd: {
         actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
         thresholdWordCount: config.jambonz.amd.thresholdWordCount,
+        timers: {
+          noSpeechTimeoutMs: config.jambonz.amd.timers.noSpeechTimeoutMs,
+          decisionTimeoutMs: config.jambonz.amd.timers.decisionTimeoutMs,
+          toneTimeoutMs: config.jambonz.amd.timers.toneTimeoutMs,
+          greetingCompletionTimeoutMs: config.jambonz.amd.timers.greetingCompletionTimeoutMs,
+        },
+        recognizer: {
+          vad: {
+            enable: config.jambonz.recognizer.vad.enable,
+          },
+        },
       },
     });
     await RedisClient.getInstance().saveCallDetails(callId, callDetails);
