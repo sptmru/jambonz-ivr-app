@@ -29,10 +29,22 @@ services:
     volumes:
       - redis_data:/data
   vosk-server:
-    image: alphacep/kaldi-en:latest
+    image: alphacep/kaldi-grpc-en:latest
     restart: unless-stopped
     ports:
-      - '2700:2700'
+      - '5001:5001'
+  vosk-proxy:
+    build:
+      context: ./vosk-proxy
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      VOSK_SERVER: 'vosk-server:5001'
+      HTTP_PORT: 3008
+      API_KEY: 'testapikey'
+      LOGLEVEL: 'debug'
+    ports:
+      - '2701:2701'
   ivr-app:
     build:
       context: .
