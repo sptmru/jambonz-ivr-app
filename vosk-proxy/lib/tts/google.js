@@ -4,9 +4,9 @@ const fs = require('fs');
 const assert = require('assert');
 let credentials;
 
-routes.post('/', async(req, res) => {
-  const {logger} = req.app.locals;
-  const {language, voice, type, text} = req.body;
+routes.post('/', async (req, res) => {
+  const { logger } = req.app.locals;
+  const { language, voice, type, text } = req.body;
   let client, opts;
   try {
     /* load credentials lazily */
@@ -16,17 +16,17 @@ routes.post('/', async(req, res) => {
       credentials = JSON.parse(json);
     }
 
-    client = new ttsGoogle.TextToSpeechClient({credentials});
+    client = new ttsGoogle.TextToSpeechClient({ credentials });
     opts = {
       voice: {
         name: voice,
         languageCode: language,
-        ssmlGender: 'SSML_VOICE_GENDER_UNSPECIFIED'
+        ssmlGender: 'SSML_VOICE_GENDER_UNSPECIFIED',
       },
-      audioConfig: {audioEncoding: 'MP3'},
+      audioConfig: { audioEncoding: 'MP3' },
     };
-    Object.assign(opts, {input: type === 'ssml' ? {ssml: text} : {text}});
-    logger.info({opts, credentials}, 'sending synthesizeSpeech request to google');
+    Object.assign(opts, { input: type === 'ssml' ? { ssml: text } : { text } });
+    logger.info({ opts, credentials }, 'sending synthesizeSpeech request to google');
     const responses = await client.synthesizeSpeech(opts);
     client.close();
     logger.info('successfully synthesized speech using google');
@@ -34,9 +34,9 @@ routes.post('/', async(req, res) => {
     res.set('Content-Length', responses[0].audioContent.length);
     res.send(responses[0].audioContent);
   } catch (err) {
-    logger.info({err, opts}, 'synthAudio: Error synthesizing speech using google');
+    logger.info({ err, opts }, 'synthAudio: Error synthesizing speech using google');
     client && client.close();
-    res.status(400).json({error: err.message});
+    res.status(400).json({ error: err.message });
     throw err;
   }
 });

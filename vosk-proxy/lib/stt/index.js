@@ -1,6 +1,5 @@
-
 const path = require('node:path');
-const transcribe = async(logger, socket, url) => {
+const transcribe = async (logger, socket, url) => {
   const p = path.basename(url);
   switch (p) {
     case 'google':

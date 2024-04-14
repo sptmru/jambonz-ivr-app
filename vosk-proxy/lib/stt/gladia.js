@@ -2,23 +2,23 @@ const Websocket = require('ws');
 const assert = require('assert');
 const GLADIA_URL = 'wss://api.gladia.io/audio/text/audio-transcription';
 
-const transcribe = async(logger, socket) => {
-  socket.on('message', async(data, isBinary) => {
+const transcribe = async (logger, socket) => {
+  socket.on('message', async (data, isBinary) => {
     try {
       if (!isBinary) {
         const obj = JSON.parse(data.toString());
-        logger.info({obj}, 'received JSON message from jambonz');
+        logger.info({ obj }, 'received JSON message from jambonz');
         assert.ok(process.env.GLADIA_API_KEY, 'GLADIA_API_KEY is required');
 
         if (obj.type === 'start') {
-          const {language, sampleRateHz, interimResults } = obj;
+          const { language, sampleRateHz, interimResults } = obj;
           assert.ok(!socket.gladiaSocket, 'Expect start only once per connection');
 
           /* need to fix this */
           const lang = language === 'en-US' ? 'english' : language;
           const gladiaSocket = new Websocket(GLADIA_URL);
           gladiaSocket
-            .on('message', (buffer) => {
+            .on('message', buffer => {
               const data = JSON.parse(buffer.toString());
               if (!data.type) return;
               const is_final = data.type === 'final';
@@ -35,10 +35,10 @@ const transcribe = async(logger, socket) => {
                   {
                     confidence: data.confidence,
                     transcript: data.transcription,
-                  }
+                  },
                 ],
                 channel: 1,
-                language
+                language,
               };
               socket.send(JSON.stringify(obj));
             })
@@ -48,29 +48,30 @@ const transcribe = async(logger, socket) => {
               socket.gladiaSocket = gladiaSocket;
 
               /* send initial configuration */
-              socket.gladiaSocket.send(JSON.stringify({
-                x_gladia_key: process.env.GLADIA_API_KEY,
-                sample_rate: sampleRateHz,
-                encoding: 'wav',
-                language: lang
-              }));
+              socket.gladiaSocket.send(
+                JSON.stringify({
+                  x_gladia_key: process.env.GLADIA_API_KEY,
+                  sample_rate: sampleRateHz,
+                  encoding: 'wav',
+                  language: lang,
+                })
+              );
             })
-            .on('error', (err) => {
+            .on('error', err => {
               logger.error({ err }, 'transcribeAssemblyAi: error');
             })
-            .on('close', (data) => {
+            .on('close', data => {
               logger.info({ data }, 'transcribeAssemblyAi: close');
               socket.gladiaSocket = null;
               socket.close();
             })
-            .on('end', (err) => {
-              logger.info({err}, 'transcribeAssemblyAi: socket closed from assemblyAi');
+            .on('end', err => {
+              logger.info({ err }, 'transcribeAssemblyAi: socket closed from assemblyAi');
             });
         } else if (obj.type === 'stop') {
           terminateSocket(socket);
         }
-      }
-      else {
+      } else {
         if (socket.gladiaSocket) {
           socket.audioBuffer.push(data);
 
@@ -84,25 +85,25 @@ const transcribe = async(logger, socket) => {
         }
       }
     } catch (err) {
-      logger.error({err}, 'transcribe: error');
+      logger.error({ err }, 'transcribe: error');
     }
   });
 
-  socket.on('error', (err) => {
-    logger.error({err}, 'transcribe: error');
+  socket.on('error', err => {
+    logger.error({ err }, 'transcribe: error');
   });
-  socket.on('close', (data) => {
-    logger.info({data}, 'transcribe: close');
+  socket.on('close', data => {
+    logger.info({ data }, 'transcribe: close');
     terminateSocket(socket);
   });
-  socket.on('end', (err) => {
-    logger.error({err}, 'transcribe: socket closed from jambonz');
+  socket.on('end', err => {
+    logger.error({ err }, 'transcribe: socket closed from jambonz');
 
     terminateSocket(socket);
   });
 };
 
-const terminateSocket = (socket) => {
+const terminateSocket = socket => {
   if (socket.assemblyAiSocket) {
     socket.assemblyAiSocket.send(JSON.stringify({ terminate_session: true }));
     socket.assemblyAiSocket.close();

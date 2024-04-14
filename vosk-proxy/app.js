@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
 const Websocket = require('ws');
-const opts = Object.assign({level: process.env.LOGLEVEL || 'info'});
+const opts = Object.assign({ level: process.env.LOGLEVEL || 'info' });
 const logger = require('pino')(opts);
 const port = process.env.HTTP_PORT || 3000;
 const routes = require('./lib/tts');
-app.locals = {...app.locals, logger};
+app.locals = { ...app.locals, logger };
 
 const isValidApiKey = (hdr, apiKey) => {
   const arr = /^Bearer (.*)$/.exec(hdr);
@@ -29,7 +29,7 @@ app.use(express.json());
 app.use('/synthesize', verifyApiKey, routes);
 app.use((err, req, res, next) => {
   logger.error(err, 'burped error');
-  res.status(err.status || 500).json({msg: err.message});
+  res.status(err.status || 500).json({ msg: err.message });
 });
 
 const server = app.listen(port, () => {
@@ -38,10 +38,13 @@ const server = app.listen(port, () => {
 
 /* handle websocket upgrade requests */
 server.on('upgrade', (request, socket, head) => {
-  logger.debug({
-    url: request.url,
-    headers: request.headers,
-  }, 'received upgrade request');
+  logger.debug(
+    {
+      url: request.url,
+      headers: request.headers,
+    },
+    'received upgrade request'
+  );
 
   /* verify the path starts with /transcribe */
   if (!request.url.startsWith('/transcribe')) {
@@ -56,7 +59,7 @@ server.on('upgrade', (request, socket, head) => {
   }
 
   /* complete the upgrade */
-  wsServer.handleUpgrade(request, socket, head, (ws) => {
+  wsServer.handleUpgrade(request, socket, head, ws => {
     logger.info(`upgraded to websocket, url: ${request.url}`);
     wsServer.emit('connection', ws, request.url);
   });

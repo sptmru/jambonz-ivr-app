@@ -50,8 +50,7 @@ function deserialize_vosk_stt_v1_StreamingRecognitionResponse(buffer_arg) {
   return vosk_stt_pb.StreamingRecognitionResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-
-var SttServiceService = exports.SttServiceService = {
+var SttServiceService = (exports.SttServiceService = {
   streamingRecognize: {
     path: '/vosk.stt.v1.SttService/StreamingRecognize',
     requestStream: true,
@@ -63,10 +62,10 @@ var SttServiceService = exports.SttServiceService = {
     responseSerialize: serialize_vosk_stt_v1_StreamingRecognitionResponse,
     responseDeserialize: deserialize_vosk_stt_v1_StreamingRecognitionResponse,
   },
-};
+});
 
 exports.SttServiceClient = grpc.makeGenericClientConstructor(SttServiceService);
-var StatsServiceService = exports.StatsServiceService = {
+var StatsServiceService = (exports.StatsServiceService = {
   getStats: {
     path: '/vosk.stt.v1.StatsService/GetStats',
     requestStream: false,
@@ -78,6 +77,6 @@ var StatsServiceService = exports.StatsServiceService = {
     responseSerialize: serialize_vosk_stt_v1_StatsResponse,
     responseDeserialize: deserialize_vosk_stt_v1_StatsResponse,
   },
-};
+});
 
 exports.StatsServiceClient = grpc.makeGenericClientConstructor(StatsServiceService);
