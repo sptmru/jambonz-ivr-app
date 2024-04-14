@@ -44,4 +44,5 @@ export const isAmdMachine = (value: string): value is AmdMachine =>
   value !== AmdResultEnum.MACHINE_STOPPED &&
   value !== AmdResultEnum.DETECTION_STOPPED &&
   value !== AmdResultEnum.DECISION_TIMEOUT &&
+  value !== AmdResultEnum.NO_SPEECH &&
   value !== AmdResultEnum.ERROR;
