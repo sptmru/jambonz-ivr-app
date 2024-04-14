@@ -28,6 +28,11 @@ services:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
     volumes:
       - redis_data:/data
+  vosk-server:
+    image: alphacep/kaldi-en:latest
+    restart: unless-stopped
+    ports:
+      - '2700:2700'
   ivr-app:
     build:
       context: .
