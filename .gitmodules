@@ -1,0 +1,3 @@
+[submodule "vosk-proxy"]
+	path = vosk-proxy
+	url = https://github.com/sptmru/jambonz-vosk-proxy
