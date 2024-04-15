@@ -39,10 +39,20 @@ export type AmdMachine = Exclude<
   | AmdResultEnum.ERROR
   | AmdResultEnum.DECISION_TIMEOUT
 >;
+export type AmdFinalEvent =
+  | AmdResultEnum.MACHINE_STOPPED
+  | AmdResultEnum.DETECTION_STOPPED
+  | AmdResultEnum.ERROR
+  | AmdResultEnum.DECISION_TIMEOUT;
+
 export const isAmdMachine = (value: string): value is AmdMachine =>
-  value !== AmdResultEnum.HUMAN &&
-  value !== AmdResultEnum.MACHINE_STOPPED &&
-  value !== AmdResultEnum.DETECTION_STOPPED &&
-  value !== AmdResultEnum.DECISION_TIMEOUT &&
-  value !== AmdResultEnum.NO_SPEECH &&
-  value !== AmdResultEnum.ERROR;
+  value === AmdResultEnum.MACHINE || value === AmdResultEnum.BEEP;
+
+export const isAmdHuman = (value: string): value is AmdResultEnum.HUMAN =>
+  value === AmdResultEnum.HUMAN || value === AmdResultEnum.NO_SPEECH;
+
+export const isAmdFinalEvent = (value: string): value is AmdFinalEvent =>
+  value === AmdResultEnum.MACHINE_STOPPED ||
+  value === AmdResultEnum.DETECTION_STOPPED ||
+  value === AmdResultEnum.ERROR ||
+  value === AmdResultEnum.DECISION_TIMEOUT;
