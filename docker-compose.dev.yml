@@ -28,6 +28,23 @@ services:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
     volumes:
       - redis_data:/data
+  vosk-server:
+    image: alphacep/kaldi-grpc-en:latest
+    restart: unless-stopped
+    expose:
+      - '5001'
+  vosk-proxy:
+    build:
+      context: ../jambonz-vosk-proxy
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      VOSK_SERVER: 'vosk-server:5001'
+      HTTP_PORT: 3008
+      API_KEY: 'testapikey'
+      LOGLEVEL: 'debug'
+    ports:
+      - '3008:3008'
   ivr-app:
     build:
       context: .
