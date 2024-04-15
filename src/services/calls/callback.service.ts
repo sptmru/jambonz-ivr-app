@@ -1,6 +1,6 @@
 import { WebhookResponse } from '@jambonz/node-client';
 import { logger } from '../../misc/Logger';
-import { AmdResult, isAmdMachine } from '../../domain/types/amdresult.type';
+import { AmdResult, isAmdFinalEvent, isAmdMachine } from '../../domain/types/amdresult.type';
 import { config } from '../../infrastructure/config/config';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
@@ -113,6 +113,11 @@ export class CallbacksService {
     if (!callDetails) {
       logger.error(`Call ID ${result.call_sid} not found in Redis`);
       return new WebhookResponse().hangup();
+    }
+
+    if (isAmdFinalEvent(result.type)) {
+      // ignore final events
+      return;
     }
 
     if (!isAmdMachine(result.type)) {
