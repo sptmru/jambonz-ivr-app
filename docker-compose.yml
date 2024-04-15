@@ -37,7 +37,7 @@ services:
     image: sptmru/vosk-proxy:latest
     restart: unless-stopped
     environment:
-      VOSK_SERVER: 'vosk-server:5001'
+      VOSK_URL: 'vosk-server:5001'
       HTTP_PORT: 3008
       API_KEY: 'testapikey'
       LOGLEVEL: 'debug'
