@@ -42,7 +42,7 @@ services:
       API_KEY: 'testapikey'
       LOGLEVEL: 'debug'
     ports:
-      - '2701:2701'
+      - '3008:3008'
   ivr-app:
     build:
       context: .
