@@ -1,6 +1,12 @@
 import { WebhookResponse } from '@jambonz/node-client';
 import { logger } from '../../misc/Logger';
-import { AmdResult, isAmdFinalEvent, isAmdMachine } from '../../domain/types/amdresult.type';
+import {
+  AmdResult,
+  isAmdFinalEvent,
+  isAmdHuman,
+  isAmdMachine,
+  machineStoppedSpeaking,
+} from '../../domain/types/amdresult.type';
 import { config } from '../../infrastructure/config/config';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
@@ -120,21 +126,28 @@ export class CallbacksService {
       return;
     }
 
-    if (!isAmdMachine(result.type)) {
-      logger.info(`AMD result on call ID ${result.call_sid} is not a machine, getting out of the AMD handler`);
-      return new WebhookResponse();
+    if (isAmdHuman(result.type)) {
+      logger.info(`AMD on call ${result.call_sid}: human detected`);
+      return;
     }
 
-    logger.info(
-      `AMD detected on call ID ${result.call_sid}, playing VM message and hanging up (URL: ${callDetails.wavUrlVM})`
-    );
-    await VoslogicApiWrapper.sendTransactionData({
-      transactionid: result.call_sid,
-      from: callDetails.numberFrom as string,
-      to: callDetails.numberTo as string,
-      Disposition: VoslogicApiDispositionEnum.VM,
-    });
-    return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
+    if (isAmdMachine(result.type)) {
+      logger.info(`AMD on call ${result.call_sid}: machine detected`);
+      return;
+    }
+
+    if (machineStoppedSpeaking(result.type)) {
+      logger.info(`AMD on call ${result.call_sid}: machine stopped speaking`);
+      logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
+
+      await VoslogicApiWrapper.sendTransactionData({
+        transactionid: result.call_sid,
+        from: callDetails.numberFrom as string,
+        to: callDetails.numberTo as string,
+        Disposition: VoslogicApiDispositionEnum.VM,
+      });
+      return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
+    }
   }
 
   static statusCallback(result: CallStatus): void {
