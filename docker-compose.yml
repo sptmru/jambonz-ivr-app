@@ -34,9 +34,7 @@ services:
     expose:
       - '5001'
   vosk-proxy:
-    build:
-      context: ./vosk-proxy
-      dockerfile: Dockerfile
+    image: sptm/vosk-proxy:latest
     restart: unless-stopped
     environment:
       VOSK_SERVER: 'vosk-server:5001'
