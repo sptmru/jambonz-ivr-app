@@ -43,8 +43,7 @@ export type AmdFinalEvent = AmdResultEnum.DETECTION_STOPPED | AmdResultEnum.ERRO
 
 export type AmdMachineStoppedSpeaking = AmdResultEnum.MACHINE_STOPPED;
 
-export const isAmdMachine = (value: string): value is AmdMachine =>
-  value === AmdResultEnum.MACHINE || value === AmdResultEnum.BEEP;
+export const isAmdMachine = (value: string): value is AmdMachine => value === AmdResultEnum.MACHINE;
 
 export const isAmdHuman = (value: string): value is AmdResultEnum.HUMAN =>
   value === AmdResultEnum.HUMAN || value === AmdResultEnum.NO_SPEECH;
@@ -55,4 +54,4 @@ export const isAmdFinalEvent = (value: string): value is AmdFinalEvent =>
   value === AmdResultEnum.DECISION_TIMEOUT;
 
 export const machineStoppedSpeaking = (value: string): value is AmdMachineStoppedSpeaking =>
-  value === AmdResultEnum.MACHINE_STOPPED;
+  value === AmdResultEnum.MACHINE_STOPPED || value === AmdResultEnum.BEEP;
