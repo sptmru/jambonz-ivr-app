@@ -3,8 +3,13 @@ import Sentry from 'winston-transport-sentry-node';
 
 import { config } from '../infrastructure/config/config';
 
-const timestampFormat = winston.format.combine(
+const consoleLogFormat = winston.format.combine(
   winston.format.colorize(),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+);
+
+const fileLogFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
 );
@@ -18,15 +23,14 @@ const sentryOptions = {
 
 const logger = winston.createLogger({
   level: config.log.level,
-  format: timestampFormat,
   defaultMeta: {},
   transports: config.log.logToFile
     ? [
-        new winston.transports.Console(),
+        new winston.transports.Console({ format: consoleLogFormat }),
         new Sentry(sentryOptions),
-        new winston.transports.File({ filename: `${config.log.directory}/${config.log.file}` }),
+        new winston.transports.File({ filename: `${config.log.directory}/${config.log.file}`, format: fileLogFormat }),
       ]
-    : [new winston.transports.Console(), new Sentry(sentryOptions)],
+    : [new winston.transports.Console({ format: consoleLogFormat }), new Sentry(sentryOptions)],
 });
 
 export { logger };
