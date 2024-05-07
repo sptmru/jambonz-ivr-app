@@ -156,8 +156,8 @@ export class CallbacksService {
     );
     const mq = MQClient.getInstance();
     void mq.publishToQueue(config.rabbitmq.callStatusQueue, result);
-    if (result.call_status === 'completed') {
-      void RedisClient.getInstance().deleteCallDetails(result.call_sid);
-    }
+    // if (result.call_status === 'completed') {
+    //   void RedisClient.getInstance().deleteCallDetails(result.call_sid);
+    // }
   }
 }
