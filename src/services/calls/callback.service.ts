@@ -133,11 +133,6 @@ export class CallbacksService {
 
     if (isAmdMachine(result.type)) {
       logger.info(`AMD on call ${result.call_sid}: machine detected`);
-      return;
-    }
-
-    if (machineStoppedSpeaking(result.type)) {
-      logger.info(`AMD on call ${result.call_sid}: machine stopped speaking`);
       logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
 
       await VoslogicApiWrapper.sendTransactionData({
@@ -147,6 +142,11 @@ export class CallbacksService {
         Disposition: VoslogicApiDispositionEnum.VM,
       });
       return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
+    }
+
+    if (machineStoppedSpeaking(result.type)) {
+      logger.info(`AMD on call ${result.call_sid}: machine stopped speaking`);
+      return;
     }
   }
 
