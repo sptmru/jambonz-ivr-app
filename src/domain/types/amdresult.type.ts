@@ -48,10 +48,11 @@ export const isAmdMachine = (value: string): value is AmdMachine => value === Am
 export const isAmdHuman = (value: string): value is AmdResultEnum.HUMAN =>
   value === AmdResultEnum.HUMAN || value === AmdResultEnum.NO_SPEECH;
 
-export const isAmdFinalEvent = (value: string): value is AmdFinalEvent =>
-  value === AmdResultEnum.DETECTION_STOPPED ||
-  value === AmdResultEnum.ERROR ||
+export const isAmdDecisionTimeout = (value: string): value is AmdResultEnum.DECISION_TIMEOUT =>
   value === AmdResultEnum.DECISION_TIMEOUT;
+
+export const isAmdFinalEvent = (value: string): value is AmdFinalEvent =>
+  value === AmdResultEnum.DETECTION_STOPPED || value === AmdResultEnum.ERROR;
 
 export const machineStoppedSpeaking = (value: string): value is AmdMachineStoppedSpeaking =>
   value === AmdResultEnum.MACHINE_STOPPED || value === AmdResultEnum.BEEP;

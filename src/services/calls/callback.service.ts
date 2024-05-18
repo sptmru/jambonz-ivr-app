@@ -2,6 +2,7 @@ import { WebhookResponse } from '@jambonz/node-client';
 import { logger } from '../../misc/Logger';
 import {
   AmdResult,
+  isAmdDecisionTimeout,
   isAmdFinalEvent,
   isAmdHuman,
   isAmdMachine,
@@ -131,7 +132,7 @@ export class CallbacksService {
       return;
     }
 
-    if (isAmdMachine(result.type)) {
+    if (isAmdMachine(result.type) || isAmdDecisionTimeout(result.type)) {
       logger.info(`AMD on call ${result.call_sid}: machine detected`);
       logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
 
