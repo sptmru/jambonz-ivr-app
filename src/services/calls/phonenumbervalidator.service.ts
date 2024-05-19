@@ -4,7 +4,9 @@ import { logger } from '../../misc/Logger';
 export class PhoneNumberValidatorService {
   static validatePhoneNumber(phoneNumber: string): PhoneNumber | undefined {
     logger.info(`Validating phone number: ${phoneNumber}`);
-    const validatedNumber = parsePhoneNumber(phoneNumber);
+    const validatedNumber = phoneNumber.startsWith('+')
+      ? parsePhoneNumber(phoneNumber)
+      : parsePhoneNumber(`+${phoneNumber}`);
     if (validatedNumber && validatedNumber.isValid()) {
       logger.info(`Phone number ${validatedNumber.number} is a valid ${validatedNumber.country} number`);
     } else {

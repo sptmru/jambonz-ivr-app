@@ -14,7 +14,6 @@ import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 
 export class CallsService {
   static prepareCallDestination(dest: string, callDetails: CallDetails): CallDestination {
-    const validatedPhoneNumber = PhoneNumberValidatorService.validatePhoneNumber(dest);
     if (isSipContact(dest)) {
       return dest.split('@')[1] === config.jambonz.sipRealm
         ? { type: CallDestinationTypeEnum.INTERNAL_USER, name: dest as SipContact }
@@ -24,6 +23,7 @@ export class CallsService {
             auth: callDetails.sipAuthData,
           };
     } else {
+      const validatedPhoneNumber = PhoneNumberValidatorService.validatePhoneNumber(dest);
       return {
         type: CallDestinationTypeEnum.PSTN,
         number: (validatedPhoneNumber as PhoneNumber).number.toString(),
