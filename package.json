@@ -7,7 +7,7 @@
     "start": "ts-node --swc src/app.ts",
     "start:dev": "ts-node-dev --respawn src/app.ts",
     "start:prod": "cd build && node app.js",
-    "build": "tsc && npm run sentry:sourcemaps",
+    "build": "tsc",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint --fix --ext .ts",
