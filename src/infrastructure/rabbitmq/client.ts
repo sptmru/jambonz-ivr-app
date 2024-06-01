@@ -79,6 +79,8 @@ export class MQClient {
       },
       async msg => {
         try {
+          logger.info(`Got unparsed message from ${queueName}: ${msg.body}`);
+          logger.info(msg.body);
           const parsedMessage = JSON.parse(msg.body);
           logger.info(`Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`);
 
