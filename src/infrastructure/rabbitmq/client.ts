@@ -79,6 +79,7 @@ export class MQClient {
       },
       async msg => {
         try {
+          logger.info(`Raw MQ message body: ${msg.body}`);
           const parsedMessage = JSON.parse(msg.body);
           logger.info(`Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`);
 
