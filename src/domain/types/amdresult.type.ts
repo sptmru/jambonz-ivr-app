@@ -56,3 +56,5 @@ export const isAmdFinalEvent = (value: string): value is AmdFinalEvent =>
 
 export const machineStoppedSpeaking = (value: string): value is AmdMachineStoppedSpeaking =>
   value === AmdResultEnum.MACHINE_STOPPED || value === AmdResultEnum.BEEP;
+
+export const isBeep = (value: string): boolean => value === AmdResultEnum.BEEP;

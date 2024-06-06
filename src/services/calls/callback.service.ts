@@ -6,6 +6,7 @@ import {
   isAmdFinalEvent,
   isAmdHuman,
   isAmdMachine,
+  isBeep,
   machineStoppedSpeaking,
 } from '../../domain/types/amdresult.type';
 import { config } from '../../infrastructure/config/config';
@@ -132,8 +133,8 @@ export class CallbacksService {
       return;
     }
 
-    if (isAmdMachine(result.type) || isAmdDecisionTimeout(result.type)) {
-      logger.info(`AMD on call ${result.call_sid}: machine detected`);
+    if (isBeep(result.type)) {
+      logger.info(`AMD on call ${result.call_sid}: beep detected`);
       logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
 
       await VoslogicApiWrapper.sendTransactionData({
