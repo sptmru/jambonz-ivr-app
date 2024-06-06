@@ -2,10 +2,8 @@ import { WebhookResponse } from '@jambonz/node-client';
 import { logger } from '../../misc/Logger';
 import {
   AmdResult,
-  isAmdDecisionTimeout,
   isAmdFinalEvent,
   isAmdHuman,
-  isAmdMachine,
   isBeep,
   machineStoppedSpeaking,
 } from '../../domain/types/amdresult.type';
