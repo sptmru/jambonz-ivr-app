@@ -175,8 +175,6 @@ export class CallbacksService {
 
     if (result.call_status === 'busy' || result.call_status === 'failed') {
       const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
-      logger.debug(`Call status object (status callback): ${JSON.stringify(result)}`);
-      logger.debug(`Call details (status callback): ${JSON.stringify(callDetails)}`);
       if (callDetails !== null) {
         void CallStatusApiWrapper.sendTransactionData({
           transactionid: callDetails.transactionId,
