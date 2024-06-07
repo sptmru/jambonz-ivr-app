@@ -44,10 +44,7 @@ services:
     ports:
       - '3008:3008'
   ivr-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    entrypoint: ./docker-entrypoint.sh
+    image: sptmru/jambonz-ivr-app:latest
     volumes:
       - ./logs:/usr/src/app/logs
     restart: unless-stopped
