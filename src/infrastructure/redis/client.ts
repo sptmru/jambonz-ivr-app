@@ -51,6 +51,7 @@ export class RedisClient {
 
   async saveCallDetails(callId: string, details: CallDetails): Promise<void> {
     logger.info(`Saving call details for call ID ${callId}`);
+    logger.debug(`Call details (saveCallDetails): ${JSON.stringify(details)}`);
     await this.connection.set(callId, JSON.stringify(details));
   }
 
