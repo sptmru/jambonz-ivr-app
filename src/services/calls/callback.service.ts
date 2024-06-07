@@ -11,8 +11,8 @@ import { config } from '../../infrastructure/config/config';
 import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { RedisClient } from '../../infrastructure/redis/client';
 import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
-import { VoslogicApiWrapper } from '../third-party/voslogic-api-wrapper.service';
-import { VoslogicApiDispositionEnum } from '../../domain/types/voslogic/dtmfpayload.type';
+import { CallStatusApiWrapper } from '../third-party/call-status-api-wrapper.service';
+import { CallStatusApiDispositionEnum } from '../../domain/types/call-status-api/dtmfpayload.type';
 import { CallStatus } from '../../domain/types/callstatus.type';
 import { MQClient } from '../../infrastructure/rabbitmq/client';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
@@ -43,11 +43,11 @@ export class CallbacksService {
 
   private static async ivrContinue(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
     logger.info(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
-    await VoslogicApiWrapper.sendTransactionData({
+    await CallStatusApiWrapper.sendTransactionData({
       transactionid: result.call_sid,
       from: callDetails.numberFrom as string,
       to: callDetails.numberTo as string,
-      Disposition: VoslogicApiDispositionEnum.CONTINUE,
+      Disposition: CallStatusApiDispositionEnum.CONTINUE,
     });
     logger.info(
       `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
@@ -70,11 +70,11 @@ export class CallbacksService {
 
   private static async ivrOptOut(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
     logger.info(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
-    await VoslogicApiWrapper.sendTransactionData({
+    await CallStatusApiWrapper.sendTransactionData({
       transactionid: result.call_sid,
       from: callDetails.numberFrom as string,
       to: callDetails.numberTo as string,
-      Disposition: VoslogicApiDispositionEnum.OPTOUT,
+      Disposition: CallStatusApiDispositionEnum.OPTOUT,
     });
 
     return new WebhookResponse().play({ url: callDetails.wavUrlOptOut }).hangup();
@@ -135,11 +135,11 @@ export class CallbacksService {
       logger.info(`AMD on call ${result.call_sid}: beep detected`);
       logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
 
-      await VoslogicApiWrapper.sendTransactionData({
+      await CallStatusApiWrapper.sendTransactionData({
         transactionid: result.call_sid,
         from: callDetails.numberFrom as string,
         to: callDetails.numberTo as string,
-        Disposition: VoslogicApiDispositionEnum.VM,
+        Disposition: CallStatusApiDispositionEnum.VM,
       });
       return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
     }

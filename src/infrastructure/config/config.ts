@@ -83,11 +83,11 @@ export const config = {
     jsonType: parsedConfig?.REDIS_JSON_TYPE != null ? parsedConfig.REDIS_JSON_TYPE : 'calldetails',
   },
   thirdParty: {
-    voslogic: {
-      apiBaseUrl:
-        parsedConfig?.VOSLOGIC_API_BASE_URL != null
-          ? parsedConfig.VOSLOGIC_API_BASE_URL
-          : 'http://vos-api.voslogic.com/api',
+    callStatusApi: {
+      baseUrl:
+        parsedConfig?.CALL_STATUS_API_BASE_URL != null
+          ? parsedConfig.CALL_STATUS_API_BASE_URL
+          : 'https://portal.dialytica.com/api',
     },
   },
   calls: {
