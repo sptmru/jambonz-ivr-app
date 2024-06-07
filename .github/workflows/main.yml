@@ -68,7 +68,7 @@ jobs:
   deploy:
     name: Deploy to staging server
     runs-on: ubuntu-latest
-    needs: [lint, prettier-format]
+    needs: [lint, prettier-format, build-and-push]
     if: github.event_name == 'push'
     steps:
       - name: install ssh keys
