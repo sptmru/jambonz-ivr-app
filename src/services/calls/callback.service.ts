@@ -173,14 +173,17 @@ export class CallbacksService {
       `Status on call ID ${result.call_sid} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`
     );
 
-    if (result.call_status === 'busy') {
+    if (result.call_status === 'busy' || result.call_status === 'failed') {
       const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
       if (callDetails !== null) {
         void CallStatusApiWrapper.sendTransactionData({
           transactionid: callDetails.transactionId,
           from: result.from,
           to: result.to,
-          disposition: CallStatusApiDispositionEnum.USER_BUSY,
+          disposition:
+            result.call_status === 'busy'
+              ? CallStatusApiDispositionEnum.USER_BUSY
+              : CallStatusApiDispositionEnum.NO_ANSWER,
         });
       }
     }
