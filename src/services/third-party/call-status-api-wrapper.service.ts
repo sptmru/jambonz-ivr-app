@@ -10,7 +10,7 @@ export class CallStatusApiWrapper {
     try {
       const response = await axios.post(`${CallStatusApiWrapper.baseUrl}/dtmf`, payload);
       logger.info(
-        `Transaction ${payload.transactionid} data sent to call status API: API answered with status ${response.status} (${response.statusText})`
+        `Transaction ${payload.transactionid} status (${payload.disposition}) sent to call status API: API answered with status ${response.status} (${response.statusText})`
       );
     } catch (err) {
       logger.error(`Transaction ${payload.transactionid} data sending to call status API failed: ${err.message}`);

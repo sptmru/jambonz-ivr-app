@@ -28,6 +28,13 @@ export class CallbacksService {
     }
     logger.info(`Starting IVR on call ID ${result.call_sid} from ${result.from} to ${result.to})`);
 
+    await CallStatusApiWrapper.sendTransactionData({
+      transactionid: callDetails.transactionId,
+      from: callDetails.numberFrom as string,
+      to: callDetails.numberTo as string,
+      disposition: CallStatusApiDispositionEnum.OPTIN,
+    });
+
     const jambonz = new WebhookResponse();
     return jambonz.pause({ length: 1 }).gather({
       actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/dtmf-callback`,
@@ -44,10 +51,10 @@ export class CallbacksService {
   private static async ivrContinue(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
     logger.info(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
     await CallStatusApiWrapper.sendTransactionData({
-      transactionid: result.call_sid,
+      transactionid: callDetails.transactionId,
       from: callDetails.numberFrom as string,
       to: callDetails.numberTo as string,
-      Disposition: CallStatusApiDispositionEnum.CONTINUE,
+      disposition: CallStatusApiDispositionEnum.CONTINUE,
     });
     logger.info(
       `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
@@ -71,10 +78,10 @@ export class CallbacksService {
   private static async ivrOptOut(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
     logger.info(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
     await CallStatusApiWrapper.sendTransactionData({
-      transactionid: result.call_sid,
+      transactionid: callDetails.transactionId,
       from: callDetails.numberFrom as string,
       to: callDetails.numberTo as string,
-      Disposition: CallStatusApiDispositionEnum.OPTOUT,
+      disposition: CallStatusApiDispositionEnum.OPTOUT,
     });
 
     return new WebhookResponse().play({ url: callDetails.wavUrlOptOut }).hangup();
@@ -86,6 +93,14 @@ export class CallbacksService {
         ? `Call ID ${result.call_sid} hangup due to DTMF timeout`
         : `Call ID ${result.call_sid} hangup due to invalid DTMF value: ${result.digits}`
     );
+
+    void CallStatusApiWrapper.sendTransactionData({
+      transactionid: result.call_sid,
+      from: result.from,
+      to: result.to,
+      disposition: CallStatusApiDispositionEnum.NOVMNOINPUT,
+    });
+
     return new WebhookResponse().hangup();
   }
 
@@ -136,10 +151,10 @@ export class CallbacksService {
       logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
 
       await CallStatusApiWrapper.sendTransactionData({
-        transactionid: result.call_sid,
+        transactionid: callDetails.transactionId,
         from: callDetails.numberFrom as string,
         to: callDetails.numberTo as string,
-        Disposition: CallStatusApiDispositionEnum.VM,
+        disposition: CallStatusApiDispositionEnum.VM,
       });
       return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
     }
@@ -154,10 +169,16 @@ export class CallbacksService {
     logger.info(
       `Status on call ID ${result.call_sid} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`
     );
+
+    if (result.call_status === 'busy') {
+      void CallStatusApiWrapper.sendTransactionData({
+        transactionid: result.call_sid,
+        from: result.from,
+        to: result.to,
+        disposition: CallStatusApiDispositionEnum.USER_BUSY,
+      });
+    }
     const mq = MQClient.getInstance();
     void mq.publishToQueue(config.rabbitmq.callStatusQueue, result);
-    // if (result.call_status === 'completed') {
-    //   void RedisClient.getInstance().deleteCallDetails(result.call_sid);
-    // }
   }
 }

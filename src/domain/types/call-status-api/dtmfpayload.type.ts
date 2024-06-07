@@ -2,7 +2,7 @@ export type CallStatusApiPayload = {
   transactionid: string;
   from: string;
   to: string;
-  Disposition: CallStatusApiDispositionEnum;
+  disposition: CallStatusApiDispositionEnum;
 };
 
 // eslint-disable-next-line no-shadow
