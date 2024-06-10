@@ -22,7 +22,7 @@ export const config = {
     host:
       parsedConfig?.LOKI_ENDPOINT != null
         ? parsedConfig.LOKI_ENDPOINT
-        : 'http://loki-gateway.jambonz.svc.cluster.local/loki/api/v1/push',
+        : 'http://loki-gateway.jambonz.svc.cluster.local',
     labels: { job: parsedConfig?.LOKI_LABEL_JOB != null ? parsedConfig.LOKI_LABEL_JOB : 'ivr-app' },
     json: parsedConfig?.LOKI_JSON != null ? parsedConfig.LOKI_JSON.toLowerCase() === 'true' : false,
     interval: parsedConfig?.LOKI_INTERVAL != null ? Number(parsedConfig.LOKI_INTERVAL) : 5,

@@ -11,7 +11,7 @@ sed -i "s|SENTRY_LOG_LEVEL=error|SENTRY_LOG_LEVEL=${SENTRY_LOG_LEVEL:-error}|" .
 sed -i "s|SENTRY_AUTH_TOKEN=authtoken|SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN:-authtoken}|" ./build/.env
 
 sed -i "s|LOKI_ENABLED=false|LOKI_ENABLED=${LOKI_ENABLED:-false}|" ./build/.env
-sed -i "s|LOKI_ENDPOINT=http://loki-gateway.jambonz.svc.cluster.local/loki/api/v1/push|LOKI_ENDPOINT=${LOKI_ENDPOINT:-http://loki-gateway.jambonz.svc.cluster.local/loki/api/v1/push}|" ./build/.env
+sed -i "s|LOKI_ENDPOINT=http://loki-gateway.jambonz.svc.cluster.local|LOKI_ENDPOINT=${LOKI_ENDPOINT:-http://loki-gateway.jambonz.svc.cluster.local}|" ./build/.env
 sed -i "s|LOKI_LABEL_JOB=ivr-app|LOKI_LABEL_JOB=${LOKI_LABEL_JOB:-ivr-app}|" ./build/.env
 sed -i "s|LOKI_JSON=false|LOKI_JSON=${LOKI_JSON:-false}|" ./build/.env
 sed -i "s|LOKI_INTERVAL=5|LOKI_INTERVAL=${LOKI_INTERVAL:-5}|" ./build/.env
