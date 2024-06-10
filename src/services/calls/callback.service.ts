@@ -100,7 +100,7 @@ export class CallbacksService {
         transactionid: callDetails.transactionId,
         from: result.from,
         to: result.to,
-        disposition: CallStatusApiDispositionEnum.USER_BUSY,
+        disposition: CallStatusApiDispositionEnum.NOVMNOINPUT,
       });
     }
 
