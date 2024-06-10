@@ -53,6 +53,8 @@ services:
     volumes:
       - ./logs:/usr/src/app/logs
     restart: unless-stopped
+    environment:
+      - LOKI_ENABLED=false
     ports:
       - '${HTTP_PORT:-8080}:${HTTP_PORT:-8080}'
     healthcheck:
