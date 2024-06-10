@@ -4,11 +4,18 @@
 echo "Updating .env"
 sed -i "s|LOG_LEVEL=debug|LOG_LEVEL=${LOG_LEVEL:-info}|" ./build/.env
 
-sed -i "s|SENTRY_DSN=https://1.ingest.us.sentry.io/1|SENTRY_DSN=${SENTRY_DSN:-}|" ./build/.env
+sed -i "s|SENTRY_DSN=https://1.ingest.us.sentry.io/1|SENTRY_DSN=${SENTRY_DSN:-https://1.ingest.us.sentry.io/1}|" ./build/.env
 sed -i "s|SENTRY_TRACES_SAMPLE_RATE=1.0|SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-1.0}|" ./build/.env
 sed -i "s|SENTRY_PROFILES_SAMPLE_RATE=1.0|SENTRY_PROFILES_SAMPLE_RATE=${SENTRY_PROFILES_SAMPLE_RATE:-1.0}|" ./build/.env
 sed -i "s|SENTRY_LOG_LEVEL=error|SENTRY_LOG_LEVEL=${SENTRY_LOG_LEVEL:-error}|" ./build/.env
 sed -i "s|SENTRY_AUTH_TOKEN=authtoken|SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN:-authtoken}|" ./build/.env
+
+sed -i "s|LOKI_ENABLED=false|LOKI_ENABLED=${LOKI_ENABLED:-false}|" ./build/.env
+sed -i "s|LOKI_ENDPOINT=http://loki-gateway.jambonz.svc.cluster.local/loki/api/v1/push|LOKI_ENDPOINT=${LOKI_ENDPOINT:-http://loki-gateway.jambonz.svc.cluster.local/loki/api/v1/push}|" ./build/.env
+sed -i "s|LOKI_LABEL_JOB=ivr-app|LOKI_LABEL_JOB=${LOKI_LABEL_JOB:-ivr-app}|" ./build/.env
+sed -i "s|LOKI_JSON=false|LOKI_JSON=${LOKI_JSON:-false}|" ./build/.env
+sed -i "s|LOKI_INTERVAL=5|LOKI_INTERVAL=${LOKI_INTERVAL:-5}|" ./build/.env
+sed -i "s|LOKI_TIMEOUT=10000|LOKI_TIMEOUT=${LOKI_TIMEOUT:-10000}|" ./build/.env
 
 sed -i "s|HTTP_HOSTNAME=http://localhost:8476|HTTP_HOSTNAME=${HTTP_HOSTNAME:-http://localhost:8476}|" ./build/.env
 sed -i "s|HTTP_PORT=8476|HTTP_PORT=${HTTP_PORT:-8476}|" ./build/.env
