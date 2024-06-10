@@ -17,6 +17,17 @@ export const config = {
       parsedConfig?.SENTRY_PROFILES_SAMPLE_RATE != null ? Number(parsedConfig.SENTRY_PROFILES_SAMPLE_RATE) : 1.0,
     logLevel: parsedConfig?.SENTRY_LOG_LEVEL != null ? parsedConfig.SENTRY_LOG_LEVEL : 'error',
   },
+  loki: {
+    enabled: parsedConfig?.LOKI_ENABLED != null ? parsedConfig.LOKI_ENABLED.toLowerCase() === 'true' : false,
+    host:
+      parsedConfig?.LOKI_ENDPOINT != null
+        ? parsedConfig.LOKI_ENDPOINT
+        : 'http://loki-gateway.jambonz.svc.cluster.local/loki/api/v1/push',
+    labels: { job: parsedConfig?.LOKI_LABEL_JOB != null ? parsedConfig.LOKI_LABEL_JOB : 'ivr-app' },
+    json: parsedConfig?.LOKI_JSON != null ? parsedConfig.LOKI_JSON.toLowerCase() === 'true' : false,
+    interval: parsedConfig?.LOKI_INTERVAL != null ? Number(parsedConfig.LOKI_INTERVAL) : 5,
+    timeout: parsedConfig?.LOKI_TIMEOUT != null ? Number(parsedConfig.LOKI_TIMEOUT) : 10000,
+  },
   api: {
     port: parsedConfig?.HTTP_PORT != null ? Number(parsedConfig.HTTP_PORT) : 3000,
     hostname: parsedConfig?.HTTP_HOSTNAME != null ? parsedConfig.HTTP_HOSTNAME : 'http://localhost',
