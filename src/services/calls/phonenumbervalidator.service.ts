@@ -3,6 +3,9 @@ import { logger } from '../../misc/Logger';
 
 export class PhoneNumberValidatorService {
   static validatePhoneNumber(phoneNumber: string): PhoneNumber | undefined {
+    if (phoneNumber.length > 14) {
+      phoneNumber = phoneNumber.substring(6);
+    }
     const validatedNumber = phoneNumber.startsWith('+')
       ? parsePhoneNumber(phoneNumber)
       : parsePhoneNumber(`+${phoneNumber}`);
