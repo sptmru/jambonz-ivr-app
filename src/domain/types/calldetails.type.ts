@@ -13,4 +13,5 @@ export type CallDetails = {
   digitContinue: string;
   digitOptOut: string;
   sipAuthData?: SipAuthData;
+  amdProcessed?: boolean;
 };

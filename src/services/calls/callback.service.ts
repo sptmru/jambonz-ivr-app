@@ -205,6 +205,20 @@ export class CallbacksService {
       return new WebhookResponse().hangup();
     }
 
+    if (callDetails.amdProcessed === true) {
+      logger.info({
+        message: `AMD status on call ID was already processed`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          call_id: result.call_sid,
+        },
+      });
+
+      return;
+    }
+
     logger.info({
       message: `AMD on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.type})`,
       labels: {
@@ -234,6 +248,7 @@ export class CallbacksService {
     }
 
     if (isBeep(result.type)) {
+      await RedisClient.getInstance().updateCallDetails(result.call_sid);
       logger.info({
         message: `AMD on call ${result.call_sid}: beep detected`,
         labels: {

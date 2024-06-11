@@ -73,6 +73,23 @@ export class RedisClient {
     await this.connection.del(callId);
   }
 
+  async updateCallDetails(callId: string): Promise<void> {
+    logger.info({
+      message: `Updating call details for call ID ${callId}`,
+      labels: {
+        job: config.loki.labels.job,
+        call_id: callId,
+      },
+    });
+    try {
+      const existingDetails = await this.getCallObject(callId);
+      const updatedDetails = { ...existingDetails, amdProcessed: true };
+      await this.saveCallDetails(callId, updatedDetails as CallDetails);
+    } catch (err) {
+      logger.error('Error updating call details', err);
+    }
+  }
+
   async getCallObject(callId: string): Promise<CallDetails | null> {
     logger.info({
       message: `Retrieving call details for call ID ${callId}`,
