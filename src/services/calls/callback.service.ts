@@ -43,13 +43,6 @@ export class CallbacksService {
       },
     });
 
-    void CallStatusApiWrapper.sendTransactionData({
-      transactionid: callDetails.transactionId,
-      from: callDetails.numberFrom as string,
-      to: callDetails.numberTo as string,
-      disposition: CallStatusApiDispositionEnum.OPTIN,
-    });
-
     const jambonz = new WebhookResponse();
     return jambonz.pause({ length: 1 }).gather({
       actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/dtmf-callback`,
