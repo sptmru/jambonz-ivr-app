@@ -3,7 +3,6 @@ import { logger } from '../../misc/Logger';
 
 export class PhoneNumberValidatorService {
   static validatePhoneNumber(phoneNumber: string): PhoneNumber | undefined {
-    logger.info(`Validating phone number: ${phoneNumber}`);
     const validatedNumber = phoneNumber.startsWith('+')
       ? parsePhoneNumber(phoneNumber)
       : parsePhoneNumber(`+${phoneNumber}`);

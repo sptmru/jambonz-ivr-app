@@ -50,17 +50,37 @@ export class RedisClient {
   }
 
   async saveCallDetails(callId: string, details: CallDetails): Promise<void> {
-    logger.info(`Saving call details for call ID ${callId}`);
+    logger.info({
+      message: `Saving call details for call ID ${callId}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: details.transactionId,
+        number_to: details.numberTo,
+        call_id: callId,
+      },
+    });
     await this.connection.set(callId, JSON.stringify(details));
   }
 
   async deleteCallDetails(callId: string): Promise<void> {
-    logger.info(`Deleting call details for call ID ${callId}`);
+    logger.info({
+      message: `Deleting call details for call ID ${callId}`,
+      labels: {
+        job: config.loki.labels.job,
+        call_id: callId,
+      },
+    });
     await this.connection.del(callId);
   }
 
   async getCallObject(callId: string): Promise<CallDetails | null> {
-    logger.info(`Retrieving call details for call ID ${callId}`);
+    logger.info({
+      message: `Retrieving call details for call ID ${callId}`,
+      labels: {
+        job: config.loki.labels.job,
+        call_id: callId,
+      },
+    });
     try {
       const data = await this.connection.get(callId);
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions

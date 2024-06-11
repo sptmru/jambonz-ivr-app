@@ -32,11 +32,37 @@ export class CallsService {
     }
   }
   static async createCall(callDetails: CallDetails): Promise<void> {
-    logger.info(`Initial request to create a call to number ${callDetails.numberTo} received`);
+    logger.info({
+      message: `Initial request to create a call to number ${callDetails.numberTo} received`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+      },
+    });
+
+    const callDestinationData = CallsService.prepareCallDestination(callDetails.numberTo, callDetails);
+
+    const callDestination =
+      // eslint-disable-next-line no-nested-ternary
+      callDestinationData.type === CallDestinationTypeEnum.PSTN
+        ? callDestinationData.number
+        : callDestinationData.type === CallDestinationTypeEnum.INTERNAL_USER
+          ? callDestinationData.name
+          : callDestinationData.sipUri;
+
+    logger.info({
+      message: `Creating a call to destination ${callDestination}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+      },
+    });
 
     const callId = await jambonz.calls.create({
       from: callDetails.numberFrom,
-      to: CallsService.prepareCallDestination(callDetails.numberTo, callDetails),
+      to: callDestinationData,
       application_sid: config.jambonz.applicationSid,
       amd: {
         actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,

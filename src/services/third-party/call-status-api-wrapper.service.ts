@@ -9,11 +9,23 @@ export class CallStatusApiWrapper {
   static async sendTransactionData(payload: CallStatusApiPayload): Promise<void> {
     try {
       const response = await axios.post(`${CallStatusApiWrapper.baseUrl}/dtmf`, payload);
-      logger.info(
-        `Transaction ${payload.transactionid} status (${payload.disposition}) sent to call status API: API answered with status ${response.status} (${response.statusText})`
-      );
+      logger.info({
+        message: `Transaction ${payload.transactionid} status (${payload.disposition}) sent to call status API: API answered with status ${response.status} (${response.statusText})`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: payload.transactionid,
+          number_to: payload.to,
+        },
+      });
     } catch (err) {
-      logger.error(`Transaction ${payload.transactionid} data sending to call status API failed: ${err.message}`);
+      logger.error({
+        message: `Transaction ${payload.transactionid} data sending to call status API failed: ${err.message}`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: payload.transactionid,
+          number_to: payload.to,
+        },
+      });
     }
   }
 }

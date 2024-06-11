@@ -23,10 +23,25 @@ export class CallbacksService {
   static async ivrInitiateCallback(result: IvrInitiateResult): Promise<WebhookResponse> {
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     if (!callDetails) {
-      logger.error(`Call ID ${result.call_sid} not found in Redis`);
+      logger.error({
+        message: `Call ID ${result.call_sid} not found in Redis`,
+        labels: {
+          job: config.loki.labels.job,
+          number_to: result.to,
+          call_id: result.call_sid,
+        },
+      });
       return new WebhookResponse().hangup();
     }
-    logger.info(`Starting IVR on call ID ${result.call_sid} from ${result.from} to ${result.to})`);
+    logger.info({
+      message: `Starting IVR on call ID ${result.call_sid} from ${result.from} to ${result.to})`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        call_id: result.call_sid,
+      },
+    });
 
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
@@ -49,16 +64,31 @@ export class CallbacksService {
   }
 
   private static ivrContinue(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
-    logger.info(`Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`);
+    logger.info({
+      message: `Continuing the call ${result.call_sid} to ${callDetails.destinationAddress}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        call_id: result.call_sid,
+      },
+    });
+
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
       from: callDetails.numberFrom as string,
       to: callDetails.numberTo as string,
       disposition: CallStatusApiDispositionEnum.CONTINUE,
     });
-    logger.info(
-      `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`
-    );
+    logger.info({
+      message: `Transfer call ID ${result.call_sid} to ${callDetails.destinationAddress} via ${callDetails.carrierAddress}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        call_id: result.call_sid,
+      },
+    });
     const validatedInitialDestination = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberTo);
     const validatedInitialCallerId = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberFrom);
 
@@ -76,7 +106,15 @@ export class CallbacksService {
   }
 
   private static ivrOptOut(result: DtmfResult, callDetails: CallDetails): Promise<WebhookResponse> {
-    logger.info(`Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`);
+    logger.info({
+      message: `Caller opted out on call ID ${result.call_sid} using digit ${result.digits}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        call_id: result.call_sid,
+      },
+    });
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
       from: callDetails.numberFrom as string,
@@ -88,14 +126,21 @@ export class CallbacksService {
   }
 
   private static async ivrHangup(result: DtmfResult): Promise<WebhookResponse> {
-    logger.info(
-      result.digits === undefined
-        ? `Call ID ${result.call_sid} hangup due to DTMF timeout`
-        : `Call ID ${result.call_sid} hangup due to invalid DTMF value: ${result.digits}`
-    );
-
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     if (callDetails !== null) {
+      logger.info({
+        message:
+          result.digits === undefined
+            ? `Call ID ${result.call_sid} hangup due to DTMF timeout`
+            : `Call ID ${result.call_sid} hangup due to invalid DTMF value: ${result.digits}`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          call_id: result.call_sid,
+        },
+      });
+
       void CallStatusApiWrapper.sendTransactionData({
         transactionid: callDetails.transactionId,
         from: result.from,
@@ -108,16 +153,31 @@ export class CallbacksService {
   }
 
   static async dtmfCallback(result: DtmfResult): Promise<WebhookResponse> {
-    logger.info(
-      result.digits === undefined
-        ? `DTMF timeout on call ID ${result.call_sid} from ${result.from} to ${result.to}`
-        : `DTMF received on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.digits})`
-    );
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     if (!callDetails) {
-      logger.error(`Call ID ${result.call_sid} not found in Redis`);
+      logger.error({
+        message: `Call ID ${result.call_sid} not found in Redis`,
+        labels: {
+          job: config.loki.labels.job,
+          number_to: result.to,
+          call_id: result.call_sid,
+        },
+      });
       return new WebhookResponse().hangup();
     }
+
+    logger.info({
+      message:
+        result.digits === undefined
+          ? `DTMF timeout on call ID ${result.call_sid} from ${result.from} to ${result.to}`
+          : `DTMF received on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.digits})`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        call_id: result.call_sid,
+      },
+    });
 
     switch (result.digits) {
       case callDetails.digitContinue:
@@ -132,12 +192,28 @@ export class CallbacksService {
   }
 
   static async amdCallback(result: AmdResult): Promise<WebhookResponse> {
-    logger.info(`AMD on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.type})`);
     const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
     if (!callDetails) {
-      logger.error(`Call ID ${result.call_sid} not found in Redis`);
+      logger.error({
+        message: `Call ID ${result.call_sid} not found in Redis`,
+        labels: {
+          job: config.loki.labels.job,
+          number_to: result.to,
+          call_id: result.call_sid,
+        },
+      });
       return new WebhookResponse().hangup();
     }
+
+    logger.info({
+      message: `AMD on call ID ${result.call_sid} from ${result.from} to ${result.to} : ${result.type})`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        call_id: result.call_sid,
+      },
+    });
 
     if (isAmdFinalEvent(result.type)) {
       // ignore final events
@@ -145,13 +221,37 @@ export class CallbacksService {
     }
 
     if (isAmdHuman(result.type)) {
-      logger.info(`AMD on call ${result.call_sid}: human detected`);
+      logger.info({
+        message: `AMD on call ${result.call_sid}: human detected`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          call_id: result.call_sid,
+        },
+      });
       return;
     }
 
     if (isBeep(result.type)) {
-      logger.info(`AMD on call ${result.call_sid}: beep detected`);
-      logger.info(`Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`);
+      logger.info({
+        message: `AMD on call ${result.call_sid}: beep detected`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          call_id: result.call_sid,
+        },
+      });
+      logger.info({
+        message: `Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          call_id: result.call_sid,
+        },
+      });
 
       await CallStatusApiWrapper.sendTransactionData({
         transactionid: callDetails.transactionId,
@@ -163,15 +263,28 @@ export class CallbacksService {
     }
 
     if (machineStoppedSpeaking(result.type)) {
-      logger.info(`AMD on call ${result.call_sid}: machine stopped speaking`);
+      logger.info({
+        message: `AMD on call ${result.call_sid}: machine stopped speaking`,
+        labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          call_id: result.call_sid,
+        },
+      });
       return;
     }
   }
 
   static async statusCallback(result: CallStatus): Promise<void> {
-    logger.info(
-      `Status on call ID ${result.call_sid} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`
-    );
+    logger.info({
+      message: `Status on call ID ${result.call_sid} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`,
+      labels: {
+        job: config.loki.labels.job,
+        number_to: result.to,
+        call_id: result.call_sid,
+      },
+    });
 
     if (result.call_status === 'busy' || result.call_status === 'failed') {
       const callDetails = await RedisClient.getInstance().getCallObject(result.call_sid);
