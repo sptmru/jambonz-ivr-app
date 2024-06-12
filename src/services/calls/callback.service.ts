@@ -253,33 +253,36 @@ export class CallbacksService {
     }
 
     if (isBeep(result.type)) {
-      await RedisClient.getInstance().updateCallDetails(result.call_sid);
-      logger.info({
-        message: `AMD on call ${result.call_sid}: beep detected`,
-        labels: {
-          job: config.loki.labels.job,
-          transaction_id: callDetails.transactionId,
-          number_to: callDetails.numberTo,
-          call_id: result.call_sid,
-        },
-      });
-      logger.info({
-        message: `Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`,
-        labels: {
-          job: config.loki.labels.job,
-          transaction_id: callDetails.transactionId,
-          number_to: callDetails.numberTo,
-          call_id: result.call_sid,
-        },
-      });
+      const webhookResponse = new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
 
-      await CallStatusApiWrapper.sendTransactionData({
-        transactionid: callDetails.transactionId,
-        from: callDetails.numberFrom as string,
-        to: callDetails.numberTo as string,
-        disposition: CallStatusApiDispositionEnum.VM,
-      });
-      return new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
+      void (async (): Promise<void> => {
+        await RedisClient.getInstance().updateCallDetails(result.call_sid);
+        logger.info({
+          message: `AMD on call ${result.call_sid}: beep detected`,
+          labels: {
+            job: config.loki.labels.job,
+            transaction_id: callDetails.transactionId,
+            number_to: callDetails.numberTo,
+            call_id: result.call_sid,
+          },
+        });
+        logger.info({
+          message: `Playing VM message on call ${result.call_sid} (URL: ${callDetails.wavUrlVM})`,
+          labels: {
+            job: config.loki.labels.job,
+            transaction_id: callDetails.transactionId,
+            number_to: callDetails.numberTo,
+            call_id: result.call_sid,
+          },
+        });
+        void CallStatusApiWrapper.sendTransactionData({
+          transactionid: callDetails.transactionId,
+          from: callDetails.numberFrom as string,
+          to: callDetails.numberTo as string,
+          disposition: CallStatusApiDispositionEnum.VM,
+        });
+      })();
+      return webhookResponse;
     }
 
     if (machineStoppedSpeaking(result.type)) {
