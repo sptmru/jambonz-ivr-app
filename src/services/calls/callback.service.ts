@@ -183,6 +183,13 @@ export class CallbacksService {
         if (result.digits === undefined) {
           return CallbacksService.ivrHangup(result);
         }
+        return new WebhookResponse().gather({
+          actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/dtmf-callback`,
+          input: ['digits'],
+          maxDigits: 1,
+          numDigits: 1,
+          timeout: config.calls.dtmfGatherTimeout,
+        });
     }
   }
 
