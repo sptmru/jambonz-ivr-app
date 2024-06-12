@@ -178,6 +178,11 @@ export class CallbacksService {
 
       case callDetails.digitOptOut:
         return CallbacksService.ivrOptOut(result, callDetails);
+
+      default:
+        if (result.digits === undefined) {
+          return CallbacksService.ivrHangup(result);
+        }
     }
   }
 
