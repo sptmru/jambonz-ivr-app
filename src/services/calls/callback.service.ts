@@ -178,9 +178,6 @@ export class CallbacksService {
 
       case callDetails.digitOptOut:
         return CallbacksService.ivrOptOut(result, callDetails);
-
-      default:
-        return CallbacksService.ivrHangup(result);
     }
   }
 
