@@ -10,6 +10,7 @@ import { CallbacksRoute } from './routes/callback/callback.route';
 import { CallsRoute } from './routes/calls/calls.route';
 import { HealthRoute } from './routes/health/health.route';
 import { CallsService } from './services/calls/calls.service';
+import { WebsocketServer } from './infrastructure/ws/server';
 
 Sentry.init({
   dsn: config.sentry.dsn,
@@ -25,6 +26,10 @@ const api = new Api({
 });
 
 api.listen();
+
+const wsServer = new WebsocketServer();
+
+wsServer.listen();
 
 const mq = MQClient.getInstance();
 // eslint-disable-next-line require-await

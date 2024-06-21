@@ -34,6 +34,10 @@ export const config = {
     basePrefix: parsedConfig?.API_BASE_PREFIX != null ? parsedConfig.API_BASE_PREFIX : '/api/v1',
     authToken: parsedConfig?.API_AUTH_TOKEN != null ? parsedConfig.API_AUTH_TOKEN : 'secret',
   },
+  ws: {
+    port: parsedConfig?.WS_PORT != null ? Number(parsedConfig.WS_PORT) : 8081,
+    hostname: parsedConfig?.WS_HOSTNAME != null ? parsedConfig.WS_HOSTNAME : 'localhost',
+  },
   jambonz: {
     sid: parsedConfig?.JAMBONZ_ACCOUNT_SID != null ? parsedConfig.JAMBONZ_ACCOUNT_SID : '1',
     apiKey: parsedConfig?.JAMBONZ_API_KEY != null ? parsedConfig.JAMBONZ_API_KEY : '1',
