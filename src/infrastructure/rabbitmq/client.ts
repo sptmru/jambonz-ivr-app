@@ -77,7 +77,7 @@ export class MQClient {
         queueOptions: { durable: true },
         qos: { prefetchCount: config.rabbitmq.prefetchCount },
       },
-      async msg => {
+      msg => {
         try {
           const parsedMessage = JSON.parse(msg.body);
           logger.info({
@@ -89,7 +89,7 @@ export class MQClient {
             },
           });
 
-          await messageHandler(parsedMessage);
+          void messageHandler(parsedMessage);
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
         }
