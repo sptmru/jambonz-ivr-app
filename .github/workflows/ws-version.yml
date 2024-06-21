@@ -1,0 +1,94 @@
+permissions:
+  contents: write
+
+name: CI Pipeline for WS version
+
+on:
+  pull_request:
+    branches:
+      - ws-version
+  push:
+    branches:
+      - ws-version
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    strategy:
+      matrix:
+        node: ['20.11.1']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: npm install
+      - name: Lint code
+        run: npm run lint --if-present
+      - name: Check for ESLint errors
+        run: npm run lint -- --max-warnings=0
+  prettier-format:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    strategy:
+      matrix:
+        node: ['20.11.1']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: npm install
+      - name: Format code
+        run: npm run format
+  build-and-push:
+    name: Build Docker image and push to Docker Hub
+    runs-on: ubuntu-latest
+    needs: [lint, prettier-format]
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Read version from file
+        id: read_version
+        run: |
+          version=$(cat version.txt)
+          echo "Current version: $version"
+          echo "::set-output name=version::$version"
+
+      - name: Increment version
+        id: increment_version
+        run: |
+          version=${{ steps.read_version.outputs.version }}
+          new_version=$(awk -F. '{$NF = $NF + 1;} 1' OFS=. <<< "$version")
+          echo "New version: $new_version"
+          echo "::set-output name=new_version::$new_version"
+
+      - name: Update version file
+        run: |
+          echo "${{ steps.increment_version.outputs.new_version }}" > version.txt
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.txt
+          git commit -m "Increment version to ${{ steps.increment_version.outputs.new_version }}"
+          git push
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/jambonz-ivr-app:${{ steps.increment_version.outputs.new_version }}-ws .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/jambonz-ivr-app:${{ steps.increment_version.outputs.new_version }}-ws
