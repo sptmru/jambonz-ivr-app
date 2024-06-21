@@ -44,7 +44,7 @@ export class CallbacksService {
     });
 
     const jambonz = new WebhookResponse();
-    return jambonz.pause({ length: 1 }).gather({
+    return jambonz.pause({ length: 2 }).gather({
       actionHook: `${config.jambonz.callbackBaseUrl}/api/v1/dtmf-callback`,
       input: ['digits'],
       maxDigits: 1,
