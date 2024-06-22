@@ -1,3 +1,5 @@
+import { CallDetails } from './calldetails.type';
+
 export type IvrInitiateResult = {
   call_sid: string;
   direction: CallDirectionEnum;
@@ -15,6 +17,7 @@ export type IvrInitiateResult = {
   fs_public_api: string;
   digits: string;
   reason: string;
+  customerData: CallDetails;
 };
 
 // eslint-disable-next-line no-shadow

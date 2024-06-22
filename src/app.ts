@@ -5,7 +5,6 @@ import { CallDetailsDefinition, SipAuthDataDefinition } from './domain/definitio
 import { Api } from './infrastructure/api/server';
 import { config } from './infrastructure/config/config';
 import { MQClient } from './infrastructure/rabbitmq/client';
-import { RedisClient } from './infrastructure/redis/client';
 import { CallbacksRoute } from './routes/callback/callback.route';
 import { CallsRoute } from './routes/calls/calls.route';
 import { HealthRoute } from './routes/health/health.route';
@@ -29,8 +28,6 @@ api.listen();
 const mq = MQClient.getInstance();
 // eslint-disable-next-line require-await
 mq.consumeToQueue(config.rabbitmq.callsQueue, CallsService.createCall);
-
-RedisClient.getInstance();
 
 const onShutdown = (): void => {
   void mq.onShutdown();
