@@ -62,6 +62,13 @@ export const config = {
             : 2000,
       },
     },
+    audioCache: {
+      prefix:
+        parsedConfig?.JAMBONZ_AUDIO_CACHE_ENABLED != null &&
+        parsedConfig.JAMBONZ_AUDIO_CACHE_ENABLED.toLowerCase() === 'false'
+          ? ''
+          : 'http_cache://',
+    },
     callbackBaseUrl:
       parsedConfig?.JAMBONZ_CALLBACK_BASE_URL != null
         ? parsedConfig.JAMBONZ_CALLBACK_BASE_URL
