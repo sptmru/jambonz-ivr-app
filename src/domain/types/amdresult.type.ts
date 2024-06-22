@@ -1,3 +1,5 @@
+import { CallDetails } from './calldetails.type';
+
 export type AmdResult = {
   call_id: string;
   call_sid: string;
@@ -17,6 +19,7 @@ export type AmdResult = {
   reason?: string;
   hint?: string;
   language?: string;
+  customerData: CallDetails;
 };
 
 // eslint-disable-next-line no-shadow

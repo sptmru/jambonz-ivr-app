@@ -1,3 +1,4 @@
+import { CallDetails } from './calldetails.type';
 import { CallDirectionEnum } from './ivrinitiateresult.type';
 
 export type DtmfResult = {
@@ -17,4 +18,5 @@ export type DtmfResult = {
   fs_public_api: string;
   digits?: string;
   reason: string;
+  customerData: CallDetails;
 };

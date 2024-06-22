@@ -2,11 +2,10 @@ import Connection, { Consumer, Publisher } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
-import { RedisClient } from '../redis/client';
 import { CallStatus } from '../../domain/types/callstatus.type';
 
 interface MessageHandler {
-  (param1: CallDetails): Promise<void>;
+  (param1: CallDetails): void;
 }
 
 export class MQClient {
@@ -14,14 +13,12 @@ export class MQClient {
   private sub: Consumer;
   private pub: Publisher | null = null;
   private queueName: string;
-  private messageHandler: MessageHandler;
   private isConsuming: boolean = false;
   public isConnected: boolean = false;
   private static instance: MQClient | null = null;
 
   constructor() {
     this.connect();
-    RedisClient.getInstance().addObserver(this);
   }
 
   static getInstance(): MQClient {
@@ -43,28 +40,8 @@ export class MQClient {
     });
   }
 
-  onRedisConnected(): void {
-    if (this.isConsuming) {
-      logger.info(`Already consuming from ${this.queueName}`);
-      return;
-    }
-    logger.info(`Redis connection is reestablished, resuming RabbitMQ message consumption`);
-    this.consumeToQueue(this.queueName, this.messageHandler);
-  }
-
-  onRedisDisconnected(): void {
-    if (!this.isConsuming) {
-      logger.info(`Not consuming from ${this.queueName}`);
-      return;
-    }
-    logger.info(`Redis connection is lost, stopping RabbitMQ message consumption`);
-    void this.sub.close();
-    this.isConsuming = false;
-  }
-
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
     this.queueName = queueName;
-    this.messageHandler = messageHandler;
 
     if (this.isConsuming) {
       logger.warn(`Already consuming from ${this.queueName}`);

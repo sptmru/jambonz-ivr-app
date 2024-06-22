@@ -1,3 +1,5 @@
+import { CallDetails } from './calldetails.type';
+
 export type CallStatus = {
   account_sid: string;
   api_base_url: string;
@@ -16,4 +18,5 @@ export type CallStatus = {
   to: string;
   trace_id: string;
   timestamp: string;
+  customerData: CallDetails;
 };

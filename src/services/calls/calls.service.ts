@@ -7,7 +7,6 @@ import {
 } from '../../domain/types/calldestination.type';
 import { CallDetails } from '../../domain/types/calldetails.type';
 import { config } from '../../infrastructure/config/config';
-import { RedisClient } from '../../infrastructure/redis/client';
 import { logger } from '../../misc/Logger';
 import { jambonz } from '../jambons/jambons-api-wrapper.service';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
@@ -31,7 +30,7 @@ export class CallsService {
       };
     }
   }
-  static async createCall(callDetails: CallDetails): Promise<void> {
+  static createCall(callDetails: CallDetails): void {
     logger.info({
       message: `Initial request to create a call to number ${callDetails.numberTo} received`,
       labels: {
@@ -60,7 +59,7 @@ export class CallsService {
       },
     });
 
-    const callId = await jambonz.calls.create({
+    void jambonz.calls.create({
       from: callDetails.numberFrom,
       to: callDestinationData,
       application_sid: config.jambonz.applicationSid,
@@ -74,7 +73,7 @@ export class CallsService {
           greetingCompletionTimeoutMs: config.jambonz.amd.timers.greetingCompletionTimeoutMs,
         },
       },
+      tag: callDetails,
     });
-    await RedisClient.getInstance().saveCallDetails(callId, callDetails);
   }
 }
