@@ -10,6 +10,7 @@ import { CallsRoute } from './routes/calls/calls.route';
 import { HealthRoute } from './routes/health/health.route';
 import { CallsService } from './services/calls/calls.service';
 import { WebsocketServer } from './infrastructure/ws/server';
+import { WsIvrEndpoint } from './routes/ws/ivr.endpoint';
 
 Sentry.init({
   dsn: config.sentry.dsn,
@@ -23,11 +24,10 @@ const api = new Api({
   routes: [HealthRoute, CallsRoute, CallbacksRoute],
   definitions: [CallDetailsDefinition, SipAuthDataDefinition],
 });
-
 api.listen();
 
-const ws = new WebsocketServer({ routes: [] });
-
+const ws = new WebsocketServer();
+ws.addEndpoints([WsIvrEndpoint]);
 ws.listen();
 
 const mq = MQClient.getInstance();
