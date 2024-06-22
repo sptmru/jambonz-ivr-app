@@ -70,8 +70,6 @@ export const config = {
   rabbitmq: {
     uri: parsedConfig?.RABBITMQ_URI != null ? parsedConfig.RABBITMQ_URI : 'amqp://guest:guest@localhost:5672',
     callsQueue: parsedConfig?.RABBITMQ_CALLS_QUEUE != null ? parsedConfig.RABBITMQ_CALLS_QUEUE : 'calls_queue',
-    callStatusQueue:
-      parsedConfig?.RABBITMQ_CALL_STATUS_QUEUE != null ? parsedConfig.RABBITMQ_CALL_STATUS_QUEUE : 'call_status_queue',
     prefetchCount: parsedConfig?.RABBITMQ_PREFETCH_COUNT != null ? Number(parsedConfig.RABBITMQ_PREFETCH_COUNT) : 10,
   },
   redis: {

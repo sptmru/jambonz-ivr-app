@@ -38,7 +38,6 @@ sed -i "s|JAMBONZ_AMD_GREETING_COMPLETION_TIMEOUT=2000|JAMBONZ_AMD_GREETING_COMP
 
 sed -i "s|RABBITMQ_URI=amqp://rabbitmq:rabbitmq@rabbitmq:5672|RABBITMQ_URI=${RABBITMQ_URI:-amqp://rabbitmq:rabbitmq@rabbitmq:5672}|" ./build/.env
 sed -i "s|RABBITMQ_CALLS_QUEUE=calls_queue|RABBITMQ_CALLS_QUEUE=${RABBITMQ_CALLS_QUEUE:-calls_queue}|" ./build/.env
-sed -i "s|RABBITMQ_CALL_STATUS_QUEUE=call_status_queue|RABBITMQ_CALL_STATUS_QUEUE=${RABBITMQ_CALL_STATUS_QUEUE:-call_status_queue}|" ./build/.env
 sed -i "s|RABBITMQ_PREFETCH_COUNT=10|RABBITMQ_PREFETCH_COUNT=${RABBITMQ_PREFETCH_COUNT:-10}|" ./build/.env
 sed -i "s|RABBITMQ_RECONNECT_TIMEOUT_MS=5000|RABBITMQ_RECONNECT_TIMEOUT_MS=${RABBITMQ_RECONNECT_TIMEOUT_MS:-5000}|" ./build/.env
 sed -i "s|RABBITMQ_USER=rabbitmq|RABBITMQ_USER=${RABBITMQ_USER:-rabbitmq}|" ./build/.env

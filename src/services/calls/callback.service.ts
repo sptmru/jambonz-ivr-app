@@ -13,7 +13,6 @@ import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
 import { CallStatusApiWrapper } from '../third-party/call-status-api-wrapper.service';
 import { CallStatusApiDispositionEnum } from '../../domain/types/call-status-api/dtmfpayload.type';
 import { CallStatus } from '../../domain/types/callstatus.type';
-import { MQClient } from '../../infrastructure/rabbitmq/client';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 import { CallsService } from './calls.service';
 
@@ -253,7 +252,5 @@ export class CallbacksService {
             : CallStatusApiDispositionEnum.NO_ANSWER,
       });
     }
-    const mq = MQClient.getInstance();
-    void mq.publishToQueue(config.rabbitmq.callStatusQueue, result);
   }
 }
