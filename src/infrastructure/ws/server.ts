@@ -6,25 +6,24 @@ import { logger } from '../../misc/Logger';
 
 export class WebsocketServer {
   public server: Server;
-  public initService: (params: { path: string }) => Client;
+  public initEndpoint: (params: { path: string }) => Client;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(init: { routes: any }) {
-    this.routes(init.routes);
+  constructor() {
     this.server = createServer();
-    this.initService = createEndpoint({ server: this.server });
+    this.initEndpoint = createEndpoint({ server: this.server });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private routes(routes: { forEach: (arg0: (route: any) => void) => void }): void {
-    routes.forEach(route => {
-      void new route(this.initService);
+  public addEndpoints(endpoints: { forEach: (arg0: (route: any) => void) => void }): void {
+    endpoints.forEach(endpoint => {
+      void new endpoint(this.initEndpoint);
     });
   }
 
   public listen(): void {
     this.server.listen(config.ws.port, config.ws.hostname, () => {
-      logger.info(`WS server listening on ws://${config.ws.hostname}:${config.ws.port}`);
+      logger.info(`WS server is listening on ws://${config.ws.hostname}:${config.ws.port}`);
     });
   }
 }
