@@ -37,7 +37,7 @@ export class CallbacksService {
       numDigits: 1,
       timeout: config.calls.dtmfGatherTimeout,
       play: {
-        url: callDetails.wavUrlAnnounce,
+        url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlAnnounce}`,
       },
     });
   }
@@ -79,10 +79,12 @@ export class CallbacksService {
         ? validatedInitialCallerId.number
         : undefined;
     const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails);
-    return new WebhookResponse().play({ url: callDetails.wavUrlContinue }).dial({
-      target: [dialTarget],
-      callerId,
-    });
+    return new WebhookResponse()
+      .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlContinue}` })
+      .dial({
+        target: [dialTarget],
+        callerId,
+      });
   }
 
   private static ivrOptOut(result: DtmfResult): WebhookResponse {
@@ -103,7 +105,9 @@ export class CallbacksService {
       disposition: CallStatusApiDispositionEnum.OPTOUT,
     });
 
-    return new WebhookResponse().play({ url: callDetails.wavUrlOptOut }).hangup();
+    return new WebhookResponse()
+      .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlOptOut}` })
+      .hangup();
   }
 
   private static ivrHangup(result: DtmfResult): WebhookResponse {
@@ -165,7 +169,7 @@ export class CallbacksService {
           numDigits: 1,
           timeout: config.calls.dtmfGatherTimeout,
           play: {
-            url: callDetails.wavUrlAnnounce,
+            url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlAnnounce}`,
           },
         });
     }
@@ -203,7 +207,9 @@ export class CallbacksService {
     }
 
     if (isBeep(result.type)) {
-      const webhookResponse = new WebhookResponse().play({ url: callDetails.wavUrlVM }).hangup();
+      const webhookResponse = new WebhookResponse()
+        .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlVM}` })
+        .hangup();
 
       void CallStatusApiWrapper.sendTransactionData({
         transactionid: callDetails.transactionId,
