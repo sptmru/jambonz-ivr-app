@@ -71,7 +71,7 @@ export class Api {
         logger.error(`Failed to start Fastify server: ${err.message}`);
         process.exit(1);
       } else {
-        logger.info(`Fastify server started`);
+        logger.info(`Fastify server is listening on ${config.jambonz.callbackBaseUrl}:${config.api.port}`);
       }
     });
   }
