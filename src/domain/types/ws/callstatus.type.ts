@@ -1,3 +1,4 @@
+import { CallDetails } from '../calldetails.type';
 import { CallDirectionEnum } from '../ivrinitiateresult.type';
 import { WsMessage } from './base/message.interface';
 import { WsMessageTypeEnum } from './base/messagetype.enum';
@@ -18,6 +19,7 @@ type WsCallStatusData = {
   originating_sip_trunk_name: string;
   local_sip_address: string;
   defaults: SpeechData;
+  customerData: CallDetails;
 };
 
 export type WsCallStatus = WsMessage<WsCallStatusData> & {

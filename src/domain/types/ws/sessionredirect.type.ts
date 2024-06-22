@@ -1,3 +1,4 @@
+import { CallDetails } from '../calldetails.type';
 import { CallDirectionEnum } from '../ivrinitiateresult.type';
 import { SipMessage } from '../sip/message.type';
 import { WsMessage } from './base/message.interface';
@@ -18,6 +19,7 @@ type WsSessionRedirectData = {
   originating_sip_ip: string;
   originating_sip_trunk_name: string;
   local_sip_address: string;
+  customerData: CallDetails;
 };
 
 export type WsSessionRedirect = WsMessage<WsSessionRedirectData> & {
