@@ -1,5 +1,6 @@
 import { createServer, Server } from 'http';
 import { createEndpoint, Client } from '@jambonz/node-client-ws';
+import { pino } from 'pino';
 
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
@@ -11,7 +12,7 @@ export class WebsocketServer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor() {
     this.server = createServer();
-    this.initEndpoint = createEndpoint({ server: this.server });
+    this.initEndpoint = createEndpoint({ server: this.server, logger: pino({ level: config.log.level }) });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
