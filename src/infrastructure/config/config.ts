@@ -35,6 +35,7 @@ export const config = {
     authToken: parsedConfig?.API_AUTH_TOKEN != null ? parsedConfig.API_AUTH_TOKEN : 'secret',
   },
   ws: {
+    enabled: parsedConfig?.WS_ENABLED != null ? parsedConfig.WS_ENABLED.toLowerCase() === 'true' : false,
     port: parsedConfig?.WS_PORT != null ? Number(parsedConfig.WS_PORT) : 8081,
     hostname: parsedConfig?.WS_HOSTNAME != null ? parsedConfig.WS_HOSTNAME : '0.0.0.0',
     endpoint: parsedConfig?.WS_ENDPOINT != null ? parsedConfig.WS_ENDPOINT : 'ws:/localhost:8081/ws/call',
