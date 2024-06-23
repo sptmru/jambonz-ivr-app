@@ -24,6 +24,7 @@ sed -i "s|WS_ENABLED=false|WS_ENABLED=${WS_ENABLED:-false}|" ./build/.env
 sed -i "s|WS_PORT=8081|WS_PORT=${WS_PORT:-8081}|" ./build/.env
 sed -i "s|WS_HOSTNAME=localhost|WS_HOSTNAME=${WS_HOSTNAME:-localhost}|" ./build/.env
 sed -i "s|WS_BASE_URL=ws://localhost:8081|WS_BASE_URL=${WS_BASE_URL:-ws://localhost:8081}|" ./build/.env
+sed -i "s|WS_URI=/ws|WS_URI=${WS_URI:-/ws}|" ./build/.env
 sed -i "s|WS_IVR_ENDPOINT=/ivr|WS_IVR_ENDPOINT=${WS_IVR_ENDPOINT:-/ivr}|" ./build/.env
 
 sed -i "s|API_BASE_PREFIX=/api/v1|API_BASE_PREFIX=${API_BASE_PREFIX:-/api/v1}|" ./build/.env
