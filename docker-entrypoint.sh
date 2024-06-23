@@ -23,7 +23,8 @@ sed -i "s|HTTP_PORT=8476|HTTP_PORT=${HTTP_PORT:-8476}|" ./build/.env
 sed -i "s|WS_ENABLED=false|WS_ENABLED=${WS_ENABLED:-false}|" ./build/.env
 sed -i "s|WS_PORT=8081|WS_PORT=${WS_PORT:-8081}|" ./build/.env
 sed -i "s|WS_HOSTNAME=localhost|WS_HOSTNAME=${WS_HOSTNAME:-localhost}|" ./build/.env
-sed -i "s|WS_ENDPOINT=ws://localhost:8081/ws/call|WS_ENDPOINT=${WS_ENDPOINT:-ws://localhost:8081/ws/call}|" ./build/.env
+sed -i "s|WS_BASE_URL=ws://localhost:8081|WS_BASE_URL=${WS_BASE_URL:-ws://localhost:8081}|" ./build/.env
+sed -i "s|WS_IVR_ENDPOINT=/ivr|WS_IVR_ENDPOINT=${WS_IVR_ENDPOINT:-/ivr}|" ./build/.env
 
 sed -i "s|API_BASE_PREFIX=/api/v1|API_BASE_PREFIX=${API_BASE_PREFIX:-/api/v1}|" ./build/.env
 sed -i "s|API_AUTH_TOKEN=agNUL59NL3prrNuLHbQfK9zuux98crULZX9dgsGioYYGAnSZQHqC7JzKmdmDjco3akLaPnDpuGp|API_AUTH_TOKEN=${API_AUTH_TOKEN:-agNUL59NL3prrNuLHbQfK9zuux98crULZX9dgsGioYYGAnSZQHqC7JzKmdmDjco3akLaPnDpuGp}|" ./build/.env

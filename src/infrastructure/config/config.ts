@@ -38,7 +38,8 @@ export const config = {
     enabled: parsedConfig?.WS_ENABLED != null ? parsedConfig.WS_ENABLED.toLowerCase() === 'true' : false,
     port: parsedConfig?.WS_PORT != null ? Number(parsedConfig.WS_PORT) : 8081,
     hostname: parsedConfig?.WS_HOSTNAME != null ? parsedConfig.WS_HOSTNAME : '0.0.0.0',
-    endpoint: parsedConfig?.WS_ENDPOINT != null ? parsedConfig.WS_ENDPOINT : 'ws:/localhost:8081/ws/call',
+    baseUrl: parsedConfig?.WS_BASE_URL != null ? parsedConfig.WS_BASE_URL : 'ws:/localhost:8081',
+    ivrEndpoint: parsedConfig?.WS_IVR_ENDPOINT != null ? parsedConfig.WS_IVR_ENDPOINT : '/ivr',
   },
   jambonz: {
     sid: parsedConfig?.JAMBONZ_ACCOUNT_SID != null ? parsedConfig.JAMBONZ_ACCOUNT_SID : '1',
