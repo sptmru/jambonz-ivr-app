@@ -64,7 +64,9 @@ export class CallsService {
       to: callDestinationData,
       application_sid: config.jambonz.applicationSid,
       amd: {
-        actionHook: config.ws.enabled ? config.ws.endpoint : `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
+        actionHook: config.ws.enabled
+          ? `${config.ws.baseUrl}/amd`
+          : `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
         thresholdWordCount: config.jambonz.amd.thresholdWordCount,
         timers: {
           noSpeechTimeoutMs: config.jambonz.amd.timers.noSpeechTimeoutMs,
