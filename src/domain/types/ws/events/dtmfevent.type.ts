@@ -1,6 +1,6 @@
 import { WsEvent } from '../base/event.interface';
 
 export type WsDtmfEvent = WsEvent & {
-  digits: string;
+  digits?: string;
   reason: string;
 };
