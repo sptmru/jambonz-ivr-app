@@ -65,7 +65,7 @@ export class CallsService {
       application_sid: config.jambonz.applicationSid,
       amd: {
         actionHook: config.ws.enabled
-          ? `${config.ws.baseUrl}/${config.ws.uri}/amd`
+          ? `${config.ws.baseUrl}/${config.ws.uri}/${config.ws.ivrEndpoint}/amd`
           : `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
         thresholdWordCount: config.jambonz.amd.thresholdWordCount,
         timers: {
