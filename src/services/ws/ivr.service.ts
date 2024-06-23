@@ -1,15 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Session } from '@jambonz/node-client-ws';
 
 import { config } from '../../infrastructure/config/config';
 import { logger } from '../../misc/Logger';
+import { WsDtmfEvent } from '../../domain/types/ws/events/dtmfevent.type';
 
 export class WsIvrService {
-  static handleNewSession(session: any): void {
-    session.on('close', WsIvrService.onClose.bind(null, session)).on('error', WsIvrService.onError.bind(null, session));
+  static handleNewSession(session: Session): void {
     logger.info(`Starting IVR on call ID ${session.call_sid} from ${session.data.from} to ${session.data.to})`);
+    logger.debug(`The WS endpoint is ${config.ws.endpoint}`);
+
     session
       .gather({
-        actionHook: config.ws.endpoint,
+        actionHook: '/dtmf',
         input: ['digits'],
         maxDigits: 1,
         numDigits: 1,
@@ -18,14 +20,11 @@ export class WsIvrService {
           url: `${config.jambonz.audioCache.prefix}${session.customerData.wavUrlAnnounce}`,
         },
       })
-      .send();
+      .send({ reply: true });
   }
 
-  private static onClose(session: any): void {
-    logger.info(`Session ${session.call_sid} closed`);
-  }
-
-  private static onError(session: any, err: Error): void {
-    logger.info(`Session ${session.call_sid} received error: ${err}`);
+  static handleDtmf(session: Session, event: WsDtmfEvent): void {
+    logger.info(`Received DTMF ${event.digits} from call ID ${session.call_sid}`);
+    session.send({ digits: event.digits });
   }
 }
