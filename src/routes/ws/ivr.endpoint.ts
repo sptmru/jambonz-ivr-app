@@ -19,10 +19,6 @@ export class WsIvrEndpoint {
         .on('/amd', this.handleAmd.bind(null, session));
       WsIvrService.handleNewSession({ client, session });
     });
-
-    client.on(WsMessageTypeEnum.VERB_HOOK, (session: Session) => {
-      logger.info(`Got verb:hook from call ID ${session.call_sid}`);
-    });
   }
 
   private handleDtmf(session: Session, event: WsDtmfEvent): void {
@@ -34,10 +30,30 @@ export class WsIvrEndpoint {
   }
 
   private onClose(session: Session): void {
-    logger.info(`Session ${session.call_sid} closed`);
+    const callDetails = session.customerData;
+    logger.info({
+      message: `Session ${session.call_id} closed`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
+      },
+    });
   }
 
   private onError(session: Session, err: Error): void {
-    logger.info(`Session ${session.call_sid} received error: ${err}`);
+    const callDetails = session.customerData;
+    logger.info({
+      message: `Session ${session.call_id} received error: ${err}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
+      },
+    });
   }
 }
