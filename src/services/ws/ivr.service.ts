@@ -5,16 +5,29 @@ import { CallStatusApiWrapper } from '../third-party/call-status-api-wrapper.ser
 import { CallStatusApiDispositionEnum } from '../../domain/types/call-status-api/dtmfpayload.type';
 import { WsData } from '../../domain/types/ws/wsdata.type';
 import { WsAmdEvent } from '../../domain/types/ws/events/amdevent.type';
+import { isBeep } from '../../domain/types/amdresult.type';
 
 export class WsIvrService {
   static handleNewSession(wsData: WsData): void {
     const { session } = wsData;
-    logger.info(`Starting IVR on call ID ${session.call_sid} from ${session.data.from} to ${session.data.to})`);
+    const callDetails = session.customerData;
+
+    logger.info({
+      message: `Starting IVR on call ID ${session.call_id})`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
+      },
+    });
     WsIvrService.gatherDtmf(wsData);
   }
 
   static gatherDtmf(wsData: WsData): void {
     const { session } = wsData;
+    const callDetails = session.customerData;
     session
       .gather({
         actionHook: '/dtmf',
@@ -30,13 +43,32 @@ export class WsIvrService {
       })
       .send();
 
-    logger.info(`Waiting for DTMF on call ID ${session.call_sid}`);
+    logger.info({
+      message: `Waiting for DTMF on call ID ${session.call_id}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
+      },
+    });
   }
 
   static ivrContinue(wsData: WsData): void {
     const { session } = wsData;
     const callDetails = session.customerData;
-    logger.info(`Transfer call ID ${session.call_sid} to ${callDetails.destinationAddress}`);
+
+    logger.info({
+      message: `Transfer call ID ${session.call_id} to ${callDetails.destinationAddress}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
+      },
+    });
 
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
@@ -51,7 +83,17 @@ export class WsIvrService {
   static ivrOptOut(wsData: WsData): void {
     const { session } = wsData;
     const callDetails = session.customerData;
-    logger.info(`Call ID ${session.call_sid} opted out from the IVR`);
+
+    logger.info({
+      message: `Call ID ${session.call_id} opted out from the IVR`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
+      },
+    });
 
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
@@ -69,13 +111,14 @@ export class WsIvrService {
     logger.info({
       message:
         event.digits === undefined
-          ? `DTMF timeout on call ID ${event.call_sid} from ${event.from} to ${event.to}`
-          : `DTMF received on call ID ${event.call_sid} from ${event.from} to ${event.to} : ${event.digits})`,
+          ? `DTMF timeout on call ID ${event.call_id}`
+          : `DTMF received on call ID ${event.call_id}: ${event.digits})`,
       labels: {
         job: config.loki.labels.job,
         transaction_id: callDetails.transactionId,
         number_to: callDetails.numberTo,
-        call_id: session.call_sid,
+        number_from: callDetails.numberFrom,
+        call_id: session.call_id,
       },
     });
 
@@ -96,7 +139,29 @@ export class WsIvrService {
   }
 
   static handleAmd(wsData: WsData & { event: WsAmdEvent }): void {
-    const { event } = wsData;
-    logger.info(`Got AMD event on call ID ${event.call_id}: ${event.type}`);
+    const { event, session } = wsData;
+    const callDetails = event.customerData;
+
+    logger.info({
+      message: `AMD on call ID ${event.call_id}: ${event.type})`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: event.call_id,
+      },
+    });
+
+    if (isBeep(event.type)) {
+      session.play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlVM}` }).send();
+
+      void CallStatusApiWrapper.sendTransactionData({
+        transactionid: callDetails.transactionId,
+        from: callDetails.numberFrom,
+        to: callDetails.numberTo,
+        disposition: CallStatusApiDispositionEnum.VM,
+      });
+    }
   }
 }
