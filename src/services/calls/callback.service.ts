@@ -243,7 +243,6 @@ export class CallbacksService {
         number_to: result.to,
         number_from: result.from,
         call_id: result.call_id,
-        transactionid: result.customerData.transactionId,
       },
     });
 
