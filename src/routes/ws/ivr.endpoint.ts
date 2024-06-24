@@ -5,11 +5,11 @@ import { WsMessageTypeEnum } from '../../domain/types/ws/base/messagetype.enum';
 import { WsIvrService } from '../../services/ws/ivr.service';
 import { WsDtmfEvent } from '../../domain/types/ws/events/dtmfevent.type';
 import { config } from '../../infrastructure/config/config';
-import { WsData } from '../../domain/types/ws/wsdata.type';
+import { WsAmdEvent } from '../../domain/types/ws/events/amdevent.type';
 
 export class WsIvrEndpoint {
   constructor(initService: (params: { path: string }) => Client) {
-    const client = initService({ path: `${config.ws.uri}/${config.ws.ivrEndpoint}` });
+    const client = initService({ path: `${config.ws.ivrEndpoint}` });
 
     client.on(WsMessageTypeEnum.SESSION_NEW, (session: Session) => {
       session
@@ -25,13 +25,12 @@ export class WsIvrEndpoint {
     });
   }
 
-  private handleDtmf(wsData: WsData & { event: WsDtmfEvent }): void {
-    WsIvrService.handleDtmf(wsData);
+  private handleDtmf(session: Session, event: WsDtmfEvent): void {
+    WsIvrService.handleDtmf({ session, event });
   }
 
-  private handleAmd(wsData: WsData & { event: WsDtmfEvent }): void {
-    // TODO: change event type to WsAmdEvent
-    WsIvrService.handleAmd(wsData);
+  private handleAmd(session: Session, event: WsAmdEvent): void {
+    WsIvrService.handleAmd({ session, event });
   }
 
   private onClose(session: Session): void {
