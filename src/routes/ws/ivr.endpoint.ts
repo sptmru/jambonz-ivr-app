@@ -17,6 +17,7 @@ export class WsIvrEndpoint {
         .on('error', this.onError.bind(null, session))
         .on('/dtmf', this.handleDtmf.bind(null, session))
         .on('/amd', this.handleAmd.bind(null, session));
+
       WsIvrService.handleNewSession({ client, session });
     });
   }
