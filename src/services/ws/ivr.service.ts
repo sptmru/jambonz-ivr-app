@@ -17,7 +17,7 @@ export class WsIvrService {
     const { session } = wsData;
     session
       .gather({
-        actionHook: '/amd',
+        actionHook: '/dtmf',
         input: ['digits'],
         dtmfBargein: true,
         listenDuringPrompt: true,
