@@ -1,3 +1,5 @@
+import { Session } from '@jambonz/node-client-ws';
+
 import { config } from '../../infrastructure/config/config';
 import { logger } from '../../misc/Logger';
 import { WsDtmfEvent } from '../../domain/types/ws/events/dtmfevent.type';
@@ -6,11 +8,14 @@ import { CallStatusApiDispositionEnum } from '../../domain/types/call-status-api
 import { WsData } from '../../domain/types/ws/wsdata.type';
 import { WsAmdEvent } from '../../domain/types/ws/events/amdevent.type';
 import { isBeep } from '../../domain/types/amdresult.type';
+import { PhoneNumberValidatorService } from '../calls/phonenumbervalidator.service';
+import { CallsService } from '../calls/calls.service';
+import { CallDetails } from '../../domain/types/calldetails.type';
 
 export class WsIvrService {
   static handleNewSession(wsData: WsData): void {
     const { session } = wsData;
-    const callDetails = session.customerData;
+    const callDetails = this.getCallDetails({ session });
 
     logger.info({
       message: `Starting IVR on call ID ${session.call_id})`,
@@ -27,7 +32,7 @@ export class WsIvrService {
 
   static gatherDtmf(wsData: WsData): void {
     const { session } = wsData;
-    const callDetails = session.customerData;
+    const callDetails = this.getCallDetails({ session });
     session
       .gather({
         actionHook: '/dtmf',
@@ -55,12 +60,32 @@ export class WsIvrService {
     });
   }
 
-  static ivrContinue(wsData: WsData): void {
+  static ivrContinue(wsData: WsData & { event: WsDtmfEvent }): void {
     const { session } = wsData;
-    const callDetails = session.customerData;
+    const callDetails = this.getCallDetails({ session, dtmfEvent: wsData.event });
+
+    const validatedInitialDestination = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberTo);
+    const validatedInitialCallerId = PhoneNumberValidatorService.validatePhoneNumber(callDetails.numberFrom);
+
+    // eslint-disable-next-line no-nested-ternary
+    const callerId = validatedInitialDestination
+      ? validatedInitialDestination.number
+      : validatedInitialCallerId
+        ? validatedInitialCallerId.number
+        : undefined;
+
+    const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails);
+
+    session
+      .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlContinue}` })
+      .dial({
+        target: [dialTarget],
+        callerId,
+      })
+      .send();
 
     logger.info({
-      message: `Transfer call ID ${session.call_id} to ${callDetails.destinationAddress}`,
+      message: `Continue IVR on call ID ${session.call_id}: transfer to ${callDetails.destinationAddress}`,
       labels: {
         job: config.loki.labels.job,
         transaction_id: callDetails.transactionId,
@@ -76,16 +101,16 @@ export class WsIvrService {
       to: callDetails.numberTo,
       disposition: CallStatusApiDispositionEnum.CONTINUE,
     });
-
-    // TODO: transfer call to destination address
   }
 
-  static ivrOptOut(wsData: WsData): void {
-    const { session } = wsData;
-    const callDetails = session.customerData;
+  static ivrOptOut(wsData: WsData & { event: WsDtmfEvent }): void {
+    const { session, event } = wsData;
+    const callDetails = this.getCallDetails({ session, dtmfEvent: event });
+
+    session.play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlOptOut}` }).hangup();
 
     logger.info({
-      message: `Call ID ${session.call_id} opted out from the IVR`,
+      message: `Caller opted out on call ID ${event.call_id} using digit ${event.digits}`,
       labels: {
         job: config.loki.labels.job,
         transaction_id: callDetails.transactionId,
@@ -101,13 +126,40 @@ export class WsIvrService {
       to: callDetails.numberTo,
       disposition: CallStatusApiDispositionEnum.OPTOUT,
     });
+  }
 
-    // TODO: play opt out audio and hangup
+  static ivrHangup(wsData: WsData & { event: WsDtmfEvent }): void {
+    const { session, event } = wsData;
+    const callDetails = this.getCallDetails({ session, dtmfEvent: event });
+
+    session.hangup().send();
+
+    logger.info({
+      message:
+        event.digits === undefined
+          ? `Call ID ${event.call_id} hangup due to DTMF timeout`
+          : `Call ID ${event.call_id} hangup due to invalid DTMF value: ${event.digits}`,
+      labels: {
+        job: config.loki.labels.job,
+        transaction_id: callDetails.transactionId,
+        number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
+        call_id: event.call_id,
+      },
+    });
+
+    void CallStatusApiWrapper.sendTransactionData({
+      transactionid: callDetails.transactionId,
+      from: event.from,
+      to: event.to,
+      disposition: CallStatusApiDispositionEnum.NOVMNOINPUT,
+    });
   }
 
   static handleDtmf(wsData: WsData & { event: WsDtmfEvent }): void {
     const { session, event } = wsData;
-    const callDetails = event.customerData;
+    const callDetails = this.getCallDetails({ session, dtmfEvent: event });
+
     logger.info({
       message:
         event.digits === undefined
@@ -124,14 +176,14 @@ export class WsIvrService {
 
     switch (event.digits) {
       case callDetails.digitContinue:
-        this.ivrContinue(session);
+        this.ivrContinue(wsData);
         break;
       case callDetails.digitOptOut:
-        this.ivrOptOut(session);
+        this.ivrOptOut(wsData);
         break;
       default:
         if (event.digits === undefined) {
-          // hangup
+          WsIvrService.ivrHangup(wsData);
         } else {
           WsIvrService.gatherDtmf(wsData);
         }
@@ -140,7 +192,7 @@ export class WsIvrService {
 
   static handleAmd(wsData: WsData & { event: WsAmdEvent }): void {
     const { event, session } = wsData;
-    const callDetails = event.customerData;
+    const callDetails = this.getCallDetails({ session, amdEvent: event });
 
     logger.info({
       message: `AMD on call ID ${event.call_id}: ${event.type})`,
@@ -163,5 +215,20 @@ export class WsIvrService {
         disposition: CallStatusApiDispositionEnum.VM,
       });
     }
+  }
+
+  private static getCallDetails(data: {
+    session: Session;
+    amdEvent?: WsAmdEvent;
+    dtmfEvent?: WsDtmfEvent;
+  }): CallDetails {
+    const { session, amdEvent, dtmfEvent } = data;
+    if (amdEvent?.customerData) {
+      return amdEvent.customerData;
+    }
+    if (dtmfEvent?.customerData) {
+      return dtmfEvent.customerData;
+    }
+    return session.customerData;
   }
 }
