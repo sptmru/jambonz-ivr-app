@@ -4,6 +4,7 @@ import { WsDtmfEvent } from '../../domain/types/ws/events/dtmfevent.type';
 import { CallStatusApiWrapper } from '../third-party/call-status-api-wrapper.service';
 import { CallStatusApiDispositionEnum } from '../../domain/types/call-status-api/dtmfpayload.type';
 import { WsData } from '../../domain/types/ws/wsdata.type';
+import { WsAmdEvent } from '../../domain/types/ws/events/amdevent.type';
 
 export class WsIvrService {
   static handleNewSession(wsData: WsData): void {
@@ -14,11 +15,9 @@ export class WsIvrService {
 
   static gatherDtmf(wsData: WsData): void {
     const { session } = wsData;
-    logger.info(`Waiting for DTMF on call ID ${session.call_sid}`);
-
     session
       .gather({
-        actionHook: `${config.ws.uri}/${config.ws.ivrEndpoint}/dtmf`,
+        actionHook: '/amd',
         input: ['digits'],
         dtmfBargein: true,
         listenDuringPrompt: true,
@@ -30,6 +29,8 @@ export class WsIvrService {
         },
       })
       .send();
+
+    logger.info(`Waiting for DTMF on call ID ${session.call_sid}`);
   }
 
   static ivrContinue(wsData: WsData): void {
@@ -94,10 +95,8 @@ export class WsIvrService {
     }
   }
 
-  static handleAmd(wsData: WsData & { event: WsDtmfEvent }): void {
-    // TODO: change event type to WsAmdEvent
-    const { session, event } = wsData;
-    logger.info(`AMD result on call ID ${session.call_sid}`);
-    logger.debug(event.reason);
+  static handleAmd(wsData: WsData & { event: WsAmdEvent }): void {
+    const { event } = wsData;
+    logger.info(`Got AMD event on call ID ${event.call_id}: ${event.type}`);
   }
 }
