@@ -39,7 +39,6 @@ export const config = {
     port: parsedConfig?.WS_PORT != null ? Number(parsedConfig.WS_PORT) : 8081,
     hostname: parsedConfig?.WS_HOSTNAME != null ? parsedConfig.WS_HOSTNAME : '0.0.0.0',
     baseUrl: parsedConfig?.WS_BASE_URL != null ? parsedConfig.WS_BASE_URL : 'ws:/localhost:8081',
-    uri: parsedConfig?.WS_URI != null ? parsedConfig.WS_URI : '/ws',
     ivrEndpoint: parsedConfig?.WS_IVR_ENDPOINT != null ? parsedConfig.WS_IVR_ENDPOINT : '/ivr',
   },
   jambonz: {
