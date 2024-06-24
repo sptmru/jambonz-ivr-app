@@ -20,6 +20,30 @@ export class WsIvrEndpoint {
 
       WsIvrService.handleNewSession({ client, session });
     });
+
+    client.on(WsMessageTypeEnum.SESSION_RECONNECT, (session: Session) => {
+      logger.debug(`Got ${WsMessageTypeEnum.SESSION_RECONNECT} event for call ID ${session.call_id}`);
+    });
+
+    client.on(WsMessageTypeEnum.SESSION_REDIRECT, (session: Session) => {
+      logger.debug(`Got ${WsMessageTypeEnum.SESSION_REDIRECT} event with message ID  ${session.msgid}`);
+    });
+
+    client.on(WsMessageTypeEnum.CALL_STATUS, (session: Session) => {
+      logger.debug(`Got ${WsMessageTypeEnum.CALL_STATUS} event with message ID  ${session.msgid}`);
+    });
+
+    client.on(WsMessageTypeEnum.VERB_HOOK, (session: Session) => {
+      logger.debug(`Got ${WsMessageTypeEnum.VERB_HOOK} event with message ID  ${session.msgid}`);
+    });
+
+    client.on(WsMessageTypeEnum.VERB_STATUS, (session: Session) => {
+      logger.debug(`Got ${WsMessageTypeEnum.VERB_STATUS} event with message ID  ${session.msgid}`);
+    });
+
+    client.on(WsMessageTypeEnum.JAMBONZ_ERROR, (session: Session) => {
+      logger.debug(`Got ${WsMessageTypeEnum.JAMBONZ_ERROR} event with message ID ${session.msgid}`);
+    });
   }
 
   private handleDtmf(session: Session, event: WsDtmfEvent): void {
