@@ -17,13 +17,16 @@
   "author": "Soslan Aldatov <soslanaldatov@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@swc/core": "^1.4.12",
+    "@swc/core": "^1.6.5",
+    "@swc/helpers": "^0.5.11",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "eslint": "^8.57.0",
     "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^3.1.4",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
     "@fastify/swagger": "^8.14.0",

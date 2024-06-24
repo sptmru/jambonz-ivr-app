@@ -7,10 +7,11 @@
       "name": "Debug Node.js",
       "sourceMaps": true,
       "smartStep": true,
-      "runtimeExecutable": "npm",
+      "trace": true,
+      "runtimeExecutable": "nodemon",
       "runtimeArgs": [
-        "run-script",
-        "start"
+        "--config",
+        "nodemon.json"
       ],
       "cwd": "${workspaceFolder}",
       "skipFiles": [
@@ -18,7 +19,10 @@
       ],
       "restart": true,
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "internalConsoleOptions": "neverOpen",
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js"
+      ],
     }
   ]
 }
