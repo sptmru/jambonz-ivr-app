@@ -17,17 +17,6 @@ services:
     ports:
       - '15672:15672'
       - '5672:5672'
-  redis:
-    image: redis/redis-stack-server:7.2.0-v10
-    restart: unless-stopped
-    environment:
-      REDIS_ARGS: '--requirepass ${REDIS_PASSWORD:-lnasdoifna0asd}'
-    ports:
-      - 6379:6379
-    healthcheck:
-      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
-    volumes:
-      - redis_data:/data
   vosk-server:
     image: alphacep/kaldi-grpc-en:latest
     restart: unless-stopped
@@ -65,8 +54,6 @@ services:
       start_period: 3s
     depends_on:
       - rabbitmq
-      - redis
 
 volumes:
   rabbitmq_data: {}
-  redis_data: {}
