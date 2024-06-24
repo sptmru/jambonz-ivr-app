@@ -1,5 +1,3 @@
-import { WebhookResponse } from '@jambonz/node-client';
-
 import { config } from '../../infrastructure/config/config';
 import { logger } from '../../misc/Logger';
 import { WsDtmfEvent } from '../../domain/types/ws/events/dtmfevent.type';
@@ -15,23 +13,23 @@ export class WsIvrService {
   }
 
   static gatherDtmf(wsData: WsData): void {
-    const { client, session } = wsData;
+    const { session } = wsData;
     logger.info(`Waiting for DTMF on call ID ${session.call_sid}`);
 
-    const response = new WebhookResponse();
-    response.gather({
-      actionHook: `${config.ws.uri}/${config.ws.ivrEndpoint}/dtmf`,
-      input: ['digits'],
-      maxDigits: 1,
-      numDigits: 1,
-      timeout: config.calls.dtmfGatherTimeout,
-      play: {
-        url: `${config.jambonz.audioCache.prefix}${session.customerData.wavUrlAnnounce}`,
-      },
-    });
-
-    client.ack(session.msgid, response);
-    // session.send({ reply: true });
+    session
+      .gather({
+        actionHook: `${config.ws.uri}/${config.ws.ivrEndpoint}/dtmf`,
+        input: ['digits'],
+        dtmfBargein: true,
+        listenDuringPrompt: true,
+        maxDigits: 1,
+        numDigits: 1,
+        timeout: config.calls.dtmfGatherTimeout,
+        play: {
+          url: `${config.jambonz.audioCache.prefix}${session.customerData.wavUrlAnnounce}`,
+        },
+      })
+      .send();
   }
 
   static ivrContinue(wsData: WsData): void {
