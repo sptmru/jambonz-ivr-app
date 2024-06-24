@@ -107,7 +107,10 @@ export class WsIvrService {
     const { session, event } = wsData;
     const callDetails = this.getCallDetails({ session, dtmfEvent: event });
 
-    session.play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlOptOut}` }).hangup();
+    session
+      .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlOptOut}` })
+      .hangup()
+      .send();
 
     logger.info({
       message: `Caller opted out on call ID ${event.call_id} using digit ${event.digits}`,
