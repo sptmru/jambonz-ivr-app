@@ -23,7 +23,7 @@ export class WebsocketServer {
   }
 
   public listen(): void {
-    this.server.listen(config.ws.port, config.ws.hostname, () => {
+    this.server.listen(config.ws.port, '0.0.0.0', () => {
       logger.info(`WS server is listening on ws://${config.ws.hostname}:${config.ws.port}`);
     });
   }
