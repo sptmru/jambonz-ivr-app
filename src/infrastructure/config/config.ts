@@ -34,6 +34,13 @@ export const config = {
     basePrefix: parsedConfig?.API_BASE_PREFIX != null ? parsedConfig.API_BASE_PREFIX : '/api/v1',
     authToken: parsedConfig?.API_AUTH_TOKEN != null ? parsedConfig.API_AUTH_TOKEN : 'secret',
   },
+  ws: {
+    enabled: parsedConfig?.WS_ENABLED != null ? parsedConfig.WS_ENABLED.toLowerCase() === 'true' : false,
+    port: parsedConfig?.WS_PORT != null ? Number(parsedConfig.WS_PORT) : 8081,
+    hostname: parsedConfig?.WS_HOSTNAME != null ? parsedConfig.WS_HOSTNAME : '0.0.0.0',
+    baseUrl: parsedConfig?.WS_BASE_URL != null ? parsedConfig.WS_BASE_URL : 'ws:/localhost:8081',
+    ivrEndpoint: parsedConfig?.WS_IVR_ENDPOINT != null ? parsedConfig.WS_IVR_ENDPOINT : '/ivr',
+  },
   jambonz: {
     sid: parsedConfig?.JAMBONZ_ACCOUNT_SID != null ? parsedConfig.JAMBONZ_ACCOUNT_SID : '1',
     apiKey: parsedConfig?.JAMBONZ_API_KEY != null ? parsedConfig.JAMBONZ_API_KEY : '1',

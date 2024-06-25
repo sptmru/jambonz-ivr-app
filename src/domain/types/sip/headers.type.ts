@@ -1,0 +1,23 @@
+export type SipHeaders = {
+  via?: string;
+  'max-forwards'?: string;
+  from?: string;
+  to?: string;
+  'call-id'?: string;
+  cseq?: string;
+  contact?: string;
+  'user-agent'?: string;
+  allow?: string;
+  'content-type'?: string;
+  'content-length'?: string;
+  'X-Account-Sid'?: string;
+  'X-CID'?: string;
+  'X-Forwarded-For'?: string;
+  'X-Originating-Carrier'?: string;
+  'X-Voip-Carrier-Sid'?: string;
+  'X-Application-Sid'?: string;
+  Diversion?: string;
+  'X-Twilio-AccountSid'?: string;
+  'X-Twilio-CallSid'?: string;
+  'p-asserted-identity'?: string;
+};

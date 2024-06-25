@@ -62,6 +62,7 @@ export class MQClient {
               job: config.loki.labels.job,
               transaction_id: parsedMessage.transactionId,
               number_to: parsedMessage.numberTo,
+              number_from: parsedMessage.numberFrom,
             },
           });
 

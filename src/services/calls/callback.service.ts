@@ -237,11 +237,12 @@ export class CallbacksService {
 
   static statusCallback(result: CallStatus): void {
     logger.info({
-      message: `Status on call ID ${result.call_sid} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`,
+      message: `Status on call ID ${result.call_id} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`,
       labels: {
         job: config.loki.labels.job,
         number_to: result.to,
-        call_id: result.call_sid,
+        number_from: result.from,
+        call_id: result.call_id,
       },
     });
 
