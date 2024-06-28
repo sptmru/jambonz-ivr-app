@@ -29,7 +29,7 @@ export class CallsService {
           : config.jambonz.defaultPrefix;
       return {
         type: CallDestinationTypeEnum.PSTN,
-        number: `${numberPrefix}${usePlusSign ? '+' : ''}${(validatedPhoneNumber as PhoneNumber).number.toString()}`,
+        number: `${numberPrefix}${usePlusSign ? '+' : ''}${(validatedPhoneNumber as PhoneNumber).number.toString().substring(1)}`,
         trunk: callDetails.carrierAddress,
       };
     }
