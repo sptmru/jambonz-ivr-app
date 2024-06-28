@@ -43,7 +43,7 @@ export const config = {
   },
   jambonz: {
     sid: parsedConfig?.JAMBONZ_ACCOUNT_SID != null ? parsedConfig.JAMBONZ_ACCOUNT_SID : '1',
-    defaultPrefix: parsedConfig?.JAMBONZ_DEFAULT_PREFIX != null ? parsedConfig.JAMBONZ_DEFAULT_PREFIX : '282798',
+    defaultPrefix: parsedConfig?.JAMBONZ_DEFAULT_PREFIX != null ? parsedConfig.JAMBONZ_DEFAULT_PREFIX : '',
     apiKey: parsedConfig?.JAMBONZ_API_KEY != null ? parsedConfig.JAMBONZ_API_KEY : '1',
     applicationSid: parsedConfig?.JAMBONZ_APPLICATION_SID != null ? parsedConfig.JAMBONZ_APPLICATION_SID : '1',
     baseUrl: parsedConfig?.JAMBONZ_BASE_URL != null ? parsedConfig.JAMBONZ_BASE_URL : 'https://api.jambonz.cloud',
