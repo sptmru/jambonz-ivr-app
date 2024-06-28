@@ -3,6 +3,7 @@ export type SipAuthData = undefined | { username?: string; password?: string };
 export type CallDetails = {
   numberTo: string;
   numberFrom: string;
+  prefix?: string;
   wavUrlAnnounce: string;
   wavUrlContinue: string;
   wavUrlOptOut: string;

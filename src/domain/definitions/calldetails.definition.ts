@@ -27,6 +27,7 @@ export const CallDetailsDefinition = {
   properties: {
     numberTo: { type: 'string' },
     numberFrom: { type: 'string' },
+    prefix: { type: 'string' },
     wavUrlAnnounce: { type: 'string' },
     wavUrlContinue: { type: 'string' },
     wavUrlOptOut: { type: 'string' },
