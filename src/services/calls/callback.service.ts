@@ -78,7 +78,7 @@ export class CallbacksService {
       : validatedInitialCallerId
         ? validatedInitialCallerId.number
         : undefined;
-    const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails);
+    const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails, true);
     return new WebhookResponse()
       .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlContinue}` })
       .dial({

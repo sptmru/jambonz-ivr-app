@@ -12,7 +12,7 @@ import { jambonz } from '../jambons/jambons-api-wrapper.service';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 
 export class CallsService {
-  static prepareCallDestination(dest: string, callDetails: CallDetails): CallDestination {
+  static prepareCallDestination(dest: string, callDetails: CallDetails, usePlusSign: boolean = false): CallDestination {
     if (isSipContact(dest)) {
       return dest.split('@')[1] === config.jambonz.sipRealm
         ? { type: CallDestinationTypeEnum.INTERNAL_USER, name: dest as SipContact }
@@ -23,9 +23,13 @@ export class CallsService {
           };
     } else {
       const validatedPhoneNumber = PhoneNumberValidatorService.validatePhoneNumber(dest);
+      const numberPrefix =
+        callDetails.prefix !== undefined && callDetails.prefix.length > 0
+          ? callDetails.prefix
+          : config.jambonz.defaultPrefix;
       return {
         type: CallDestinationTypeEnum.PSTN,
-        number: (validatedPhoneNumber as PhoneNumber).number.toString(),
+        number: `${numberPrefix}${usePlusSign ? '+' : ''}${(validatedPhoneNumber as PhoneNumber).number.toString()}`,
         trunk: callDetails.carrierAddress,
       };
     }
@@ -37,10 +41,11 @@ export class CallsService {
         job: config.loki.labels.job,
         transaction_id: callDetails.transactionId,
         number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
       },
     });
 
-    const callDestinationData = CallsService.prepareCallDestination(callDetails.numberTo, callDetails);
+    const callDestinationData = CallsService.prepareCallDestination(callDetails.numberTo, callDetails, false);
 
     const callDestination =
       // eslint-disable-next-line no-nested-ternary
@@ -56,6 +61,7 @@ export class CallsService {
         job: config.loki.labels.job,
         transaction_id: callDetails.transactionId,
         number_to: callDetails.numberTo,
+        number_from: callDetails.numberFrom,
       },
     });
 

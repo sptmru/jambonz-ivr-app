@@ -74,7 +74,7 @@ export class WsIvrService {
         ? validatedInitialCallerId.number
         : undefined;
 
-    const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails);
+    const dialTarget = CallsService.prepareCallDestination(callDetails.destinationAddress, callDetails, true);
 
     session
       .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlContinue}` })
