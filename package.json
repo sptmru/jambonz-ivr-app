@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node --swc src/app.ts",
     "start:dev": "ts-node-dev --respawn src/app.ts",
+    "start:nodemon": "nodemon --config nodemon.json",
     "start:prod": "cd build && node app.js",
     "build": "tsc",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
