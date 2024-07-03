@@ -7,8 +7,9 @@ export class CallStatusApiWrapper {
   public static baseUrl = config.thirdParty.callStatusApi.baseUrl;
 
   static async sendTransactionData(payload: CallStatusApiPayload): Promise<void> {
+    const destination = payload.to.startsWith('+') ? payload.to : `+${payload.to}`;
     try {
-      const response = await axios.post(`${CallStatusApiWrapper.baseUrl}/dtmf`, payload);
+      const response = await axios.post(`${CallStatusApiWrapper.baseUrl}/dtmf`, { ...payload, to: destination });
       logger.info({
         message: `Transaction ${payload.transactionid} status (${payload.disposition}) sent to call status API: API answered with status ${response.status} (${response.statusText})`,
         labels: {
