@@ -83,7 +83,7 @@ export class CallsService {
         tag: callDetails,
       });
     } catch(err) {
-      logger.error({ message: '`Got error from Jambonz API when creating a call: ${err}`', labels: {
+      logger.error({ message: `Got error from Jambonz API when creating a call: ${err}`, labels: {
           job: config.loki.labels.job,
           transaction_id: callDetails.transactionId,
           number_to: callDetails.numberTo,
