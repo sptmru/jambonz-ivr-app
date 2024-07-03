@@ -34,7 +34,7 @@ export class CallsService {
       };
     }
   }
-  static createCall(callDetails: CallDetails): void {
+  static async createCall(callDetails: CallDetails): Promise<void> {
     logger.info({
       message: `Initial request to create a call to number ${callDetails.numberTo} received`,
       labels: {
@@ -65,21 +65,30 @@ export class CallsService {
       },
     });
 
-    void jambonz.calls.create({
-      from: callDetails.numberFrom,
-      to: callDestinationData,
-      application_sid: config.jambonz.applicationSid,
-      amd: {
-        actionHook: config.ws.enabled ? `/amd` : `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
-        thresholdWordCount: config.jambonz.amd.thresholdWordCount,
-        timers: {
-          noSpeechTimeoutMs: config.jambonz.amd.timers.noSpeechTimeoutMs,
-          decisionTimeoutMs: config.jambonz.amd.timers.decisionTimeoutMs,
-          toneTimeoutMs: config.jambonz.amd.timers.toneTimeoutMs,
-          greetingCompletionTimeoutMs: config.jambonz.amd.timers.greetingCompletionTimeoutMs,
+    try {
+      await jambonz.calls.create({
+        from: callDetails.numberFrom,
+        to: callDestinationData,
+        application_sid: config.jambonz.applicationSid,
+        amd: {
+          actionHook: config.ws.enabled ? `/amd` : `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
+          thresholdWordCount: config.jambonz.amd.thresholdWordCount,
+          timers: {
+            noSpeechTimeoutMs: config.jambonz.amd.timers.noSpeechTimeoutMs,
+            decisionTimeoutMs: config.jambonz.amd.timers.decisionTimeoutMs,
+            toneTimeoutMs: config.jambonz.amd.timers.toneTimeoutMs,
+            greetingCompletionTimeoutMs: config.jambonz.amd.timers.greetingCompletionTimeoutMs,
+          },
         },
-      },
-      tag: callDetails,
-    });
+        tag: callDetails,
+      });
+    } catch(err) {
+      logger.error({ message: '`Got error from Jambonz API when creating a call: ${err}`', labels: {
+          job: config.loki.labels.job,
+          transaction_id: callDetails.transactionId,
+          number_to: callDetails.numberTo,
+          number_from: callDetails.numberFrom,
+        }});
+    }
   }
 }

@@ -7,7 +7,7 @@ export class CallsController {
   static createCall(request: FastifyRequest<{ Body: CallDetails }>, reply: FastifyReply): FastifyReply {
     const callDetails = request.body;
     try {
-      CallsService.createCall(callDetails);
+      void CallsService.createCall(callDetails);
       return reply.code(200).send({ message: 'Call created successfully' });
     } catch (err) {
       logger.error(`Error while creating a call via HTTP API: ${err.message}`);
