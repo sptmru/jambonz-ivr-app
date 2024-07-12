@@ -27,6 +27,9 @@ export class CallsService {
         callDetails.prefix !== undefined && callDetails.prefix.length > 0
           ? callDetails.prefix
           : config.jambonz.defaultPrefix;
+      logger.info(`Prefix in the payload is ${callDetails.prefix}`);
+      logger.info(`Default prefix is ${config.jambonz.defaultPrefix}`);
+      logger.info(`Using number prefix ${numberPrefix} for call to ${dest}`);
       return {
         type: CallDestinationTypeEnum.PSTN,
         number: `${numberPrefix}${usePlusSign ? '+' : ''}${(validatedPhoneNumber as PhoneNumber).number.toString().substring(1)}`,
