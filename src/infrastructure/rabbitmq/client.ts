@@ -83,10 +83,10 @@ export class MQClient {
             return 0; // Acknowledge the message
           } catch (err) {
             logger.error(`Consumer error on queue ${queueName}: ${err}`);
-            return 1; // Nack the message
+            throw err;
           }
         } else {
-          return 1; // Nack the message if rate limit is hit
+          throw new Error('Too many messages being processed');
         }
       }
     );
