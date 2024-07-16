@@ -16,10 +16,13 @@ export class MQClient {
   public isConnected: boolean = false;
   private static instance: MQClient | null = null;
 
+  private messageCount: number = 0;
   private readonly MAX_MESSAGES: number = config.rabbitmq.prefetchCount;
+  private readonly TIME_INTERVAL: number = 10000; // 10 seconds
 
   constructor() {
     this.connect();
+    this.setupMessageCounterReset();
   }
 
   static getInstance(): MQClient {
@@ -41,6 +44,12 @@ export class MQClient {
     });
   }
 
+  private setupMessageCounterReset(): void {
+    setInterval(() => {
+      this.messageCount = 0;
+    }, this.TIME_INTERVAL);
+  }
+
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
     this.queueName = queueName;
 
@@ -56,22 +65,28 @@ export class MQClient {
         qos: { prefetchCount: this.MAX_MESSAGES },
       },
       async msg => {
-        try {
-          const parsedMessage = JSON.parse(msg.body);
-          logger.info({
-            message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
-            labels: {
-              job: config.loki.labels.job,
-              transaction_id: parsedMessage.transactionId,
-              number_to: parsedMessage.numberTo,
-              number_from: parsedMessage.numberFrom,
-            },
-          });
+        if (this.messageCount < this.MAX_MESSAGES) {
+          try {
+            const parsedMessage = JSON.parse(msg.body);
+            logger.info({
+              message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
+              labels: {
+                job: config.loki.labels.job,
+                transaction_id: parsedMessage.transactionId,
+                number_to: parsedMessage.numberTo,
+                number_from: parsedMessage.numberFrom,
+              },
+            });
 
-          await messageHandler(parsedMessage);
-        } catch (err) {
-          logger.error(`Consumer error on queue ${queueName}: ${err}`);
-          throw err;
+            await messageHandler(parsedMessage);
+            this.messageCount++;
+            return 0; // Acknowledge the message
+          } catch (err) {
+            logger.error(`Consumer error on queue ${queueName}: ${err}`);
+            return 1; // Nack the message
+          }
+        } else {
+          return 1; // Nack the message if rate limit is hit
         }
       }
     );
