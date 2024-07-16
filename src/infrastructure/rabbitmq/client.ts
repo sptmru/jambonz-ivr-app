@@ -16,8 +16,13 @@ export class MQClient {
   public isConnected: boolean = false;
   private static instance: MQClient | null = null;
 
+  private messageCount: number = 0;
+  private readonly MAX_MESSAGES: number = config.rabbitmq.prefetchCount;
+  private readonly TIME_INTERVAL: number = 10000; // 10 seconds
+
   constructor() {
     this.connect();
+    this.setupMessageCounterReset();
   }
 
   static getInstance(): MQClient {
@@ -39,6 +44,12 @@ export class MQClient {
     });
   }
 
+  private setupMessageCounterReset(): void {
+    setInterval(() => {
+      this.messageCount = 0;
+    }, this.TIME_INTERVAL);
+  }
+
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
     this.queueName = queueName;
 
@@ -51,26 +62,31 @@ export class MQClient {
       {
         queue: queueName,
         queueOptions: { durable: true },
-        qos: { prefetchCount: config.rabbitmq.prefetchCount },
+        qos: { prefetchCount: this.MAX_MESSAGES },
       },
-      msg => {
-        try {
-          const parsedMessage = JSON.parse(msg.body);
-          logger.info({
-            message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
-            labels: {
-              job: config.loki.labels.job,
-              transaction_id: parsedMessage.transactionId,
-              number_to: parsedMessage.numberTo,
-              number_from: parsedMessage.numberFrom,
-            },
-          });
+      async msg => {
+        if (this.messageCount < this.MAX_MESSAGES) {
+          try {
+            const parsedMessage = JSON.parse(msg.body);
+            logger.info({
+              message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
+              labels: {
+                job: config.loki.labels.job,
+                transaction_id: parsedMessage.transactionId,
+                number_to: parsedMessage.numberTo,
+                number_from: parsedMessage.numberFrom,
+              },
+            });
 
-          void messageHandler(parsedMessage);
-        } catch (err) {
-          logger.error(`Consumer error on queue ${queueName}: ${err}`);
+            messageHandler(parsedMessage);
+            this.messageCount++;
+          } catch (err) {
+            logger.error(`Consumer error on queue ${queueName}: ${err}`);
+            throw err;
+          }
+        } else {
+          throw new Error();
         }
-        return;
       }
     );
     this.isConsuming = true;
