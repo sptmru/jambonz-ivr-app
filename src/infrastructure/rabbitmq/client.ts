@@ -4,7 +4,7 @@ import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
 
 interface MessageHandler {
-  (param1: CallDetails): void;
+  (param1: CallDetails): Promise<void>;
 }
 
 export class MQClient {
@@ -16,13 +16,10 @@ export class MQClient {
   public isConnected: boolean = false;
   private static instance: MQClient | null = null;
 
-  private messageCount: number = 0;
   private readonly MAX_MESSAGES: number = config.rabbitmq.prefetchCount;
-  private readonly TIME_INTERVAL: number = 10000; // 10 seconds
 
   constructor() {
     this.connect();
-    this.setupMessageCounterReset();
   }
 
   static getInstance(): MQClient {
@@ -44,12 +41,6 @@ export class MQClient {
     });
   }
 
-  private setupMessageCounterReset(): void {
-    setInterval(() => {
-      this.messageCount = 0;
-    }, this.TIME_INTERVAL);
-  }
-
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
     this.queueName = queueName;
 
@@ -65,27 +56,22 @@ export class MQClient {
         qos: { prefetchCount: this.MAX_MESSAGES },
       },
       async msg => {
-        if (this.messageCount < this.MAX_MESSAGES) {
-          try {
-            const parsedMessage = JSON.parse(msg.body);
-            logger.info({
-              message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
-              labels: {
-                job: config.loki.labels.job,
-                transaction_id: parsedMessage.transactionId,
-                number_to: parsedMessage.numberTo,
-                number_from: parsedMessage.numberFrom,
-              },
-            });
+        try {
+          const parsedMessage = JSON.parse(msg.body);
+          logger.info({
+            message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
+            labels: {
+              job: config.loki.labels.job,
+              transaction_id: parsedMessage.transactionId,
+              number_to: parsedMessage.numberTo,
+              number_from: parsedMessage.numberFrom,
+            },
+          });
 
-            messageHandler(parsedMessage);
-            this.messageCount++;
-          } catch (err) {
-            logger.error(`Consumer error on queue ${queueName}: ${err}`);
-            throw err;
-          }
-        } else {
-          throw new Error();
+          await messageHandler(parsedMessage);
+        } catch (err) {
+          logger.error(`Consumer error on queue ${queueName}: ${err}`);
+          throw err;
         }
       }
     );
