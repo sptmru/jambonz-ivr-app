@@ -64,7 +64,7 @@ export class MQClient {
         queueOptions: { durable: true },
         qos: { prefetchCount: this.MAX_MESSAGES },
       },
-      async msg => {
+       msg => {
         if (this.messageCount < this.MAX_MESSAGES) {
           try {
             const parsedMessage = JSON.parse(msg.body);
