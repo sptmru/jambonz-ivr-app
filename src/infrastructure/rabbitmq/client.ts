@@ -78,7 +78,7 @@ export class MQClient {
               },
             });
 
-            await messageHandler(parsedMessage);
+            void messageHandler(parsedMessage);
             this.messageCount++;
             return 0; // Acknowledge the message
           } catch (err) {
