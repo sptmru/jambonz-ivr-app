@@ -18,7 +18,7 @@ export class MQClient {
 
   private messageCount: number = 0;
   private readonly MAX_MESSAGES: number = config.rabbitmq.prefetchCount;
-  private readonly TIME_INTERVAL: number = 1000; // 1 second
+  private readonly TIME_INTERVAL: number = 10000;
 
   constructor() {
     this.connect();
