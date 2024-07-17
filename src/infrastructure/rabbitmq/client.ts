@@ -33,7 +33,7 @@ export class MQClient {
   }
 
   private connect(): void {
-    this.connection = new Connection(config.rabbitmq.uri);
+    this.connection = new Connection({ url: config.rabbitmq.uri, heartbeat: config.rabbitmq.heartbeat } );
     this.connection.on('error', err => {
       this.isConnected = false;
       logger.error(`RabbitMQ connection error: ${err}`);
