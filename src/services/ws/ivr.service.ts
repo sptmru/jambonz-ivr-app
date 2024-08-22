@@ -153,8 +153,8 @@ export class WsIvrService {
 
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
-      from: event.from,
-      to: event.to,
+      from: event.customerData.numberFrom,
+      to: event.customerData.numberTo,
       disposition: CallStatusApiDispositionEnum.NOVMNOINPUT,
     });
   }

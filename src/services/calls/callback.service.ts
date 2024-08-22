@@ -127,8 +127,8 @@ export class CallbacksService {
 
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
-      from: result.from,
-      to: result.to,
+      from: result.customerData.numberFrom,
+      to: result.customerData.numberTo,
       disposition: CallStatusApiDispositionEnum.NOVMNOINPUT,
     });
 
@@ -240,8 +240,8 @@ export class CallbacksService {
       message: `Status on call ID ${result.call_id} from ${result.from} to ${result.to} — status: ${result.call_status} (code ${result.sip_status})`,
       labels: {
         job: config.loki.labels.job,
-        number_to: result.to,
-        number_from: result.from,
+        number_to: result.customerData.numberTo,
+        number_from: result.customerData.numberFrom,
         call_id: result.call_id,
       },
     });
@@ -251,8 +251,8 @@ export class CallbacksService {
 
       void CallStatusApiWrapper.sendTransactionData({
         transactionid: callDetails.transactionId,
-        from: result.from,
-        to: result.to,
+        from: result.customerData.numberFrom,
+        to: result.customerData.numberTo,
         disposition:
           result.call_status === 'busy'
             ? CallStatusApiDispositionEnum.USER_BUSY
