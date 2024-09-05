@@ -1,4 +1,4 @@
-export type CallStatusApiPayload = {
+export type fCallStatusApiPayload = {
   transactionid: string;
   from: string;
   to: string;

@@ -17,6 +17,7 @@ export type DtmfResult = {
   api_base_url: string;
   fs_public_api: string;
   digits?: string;
+  speech?: string;
   reason: string;
   customerData: CallDetails;
 };

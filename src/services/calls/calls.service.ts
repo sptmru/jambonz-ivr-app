@@ -73,16 +73,6 @@ export class CallsService {
         from: callDetails.numberFrom,
         to: callDestinationData,
         application_sid: config.jambonz.applicationSid,
-        amd: {
-          actionHook: config.ws.enabled ? `/amd` : `${config.jambonz.callbackBaseUrl}/api/v1/amd-callback`,
-          thresholdWordCount: config.jambonz.amd.thresholdWordCount,
-          timers: {
-            noSpeechTimeoutMs: config.jambonz.amd.timers.noSpeechTimeoutMs,
-            decisionTimeoutMs: config.jambonz.amd.timers.decisionTimeoutMs,
-            toneTimeoutMs: config.jambonz.amd.timers.toneTimeoutMs,
-            greetingCompletionTimeoutMs: config.jambonz.amd.timers.greetingCompletionTimeoutMs,
-          },
-        },
         tag: callDetails,
       });
     } catch(err) {
