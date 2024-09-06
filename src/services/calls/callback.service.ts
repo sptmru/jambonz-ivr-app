@@ -40,7 +40,7 @@ export class CallbacksService {
 
   static dtmfCallback(result: DtmfResult): WebhookResponse {
     logger.info(`Got GATHER result: ${result.speech}`);
-    logger.info(result);
+    console.dir(result.speech);
   }
 
   static amdCallback(result: AmdResult): WebhookResponse {
