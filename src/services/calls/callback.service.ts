@@ -249,15 +249,18 @@ export class CallbacksService {
     if (result.call_status === 'busy' || result.call_status === 'failed') {
       const callDetails = result.customerData;
 
-      void CallStatusApiWrapper.sendTransactionData({
-        transactionid: callDetails.transactionId,
-        from: result.from,
-        to: result.to,
-        disposition:
-          result.call_status === 'busy'
-            ? CallStatusApiDispositionEnum.USER_BUSY
-            : CallStatusApiDispositionEnum.NO_ANSWER,
-      });
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (callDetails?.transactionId) {
+        void CallStatusApiWrapper.sendTransactionData({
+          transactionid: callDetails.transactionId,
+          from: result.from,
+          to: result.to,
+          disposition:
+            result.call_status === 'busy'
+              ? CallStatusApiDispositionEnum.USER_BUSY
+              : CallStatusApiDispositionEnum.NO_ANSWER,
+        });
+      }
     }
   }
 }
