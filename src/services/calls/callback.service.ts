@@ -127,8 +127,8 @@ export class CallbacksService {
 
     void CallStatusApiWrapper.sendTransactionData({
       transactionid: callDetails.transactionId,
-      from: result.from,
-      to: result.to,
+      from: callDetails.numberFrom as string,
+      to: callDetails.numberTo as string,
       disposition: CallStatusApiDispositionEnum.NOVMNOINPUT,
     });
 
@@ -253,8 +253,8 @@ export class CallbacksService {
       if (callDetails?.transactionId) {
         void CallStatusApiWrapper.sendTransactionData({
           transactionid: callDetails.transactionId,
-          from: result.from,
-          to: result.to,
+          from: callDetails.numberFrom as string,
+          to: callDetails.numberTo as string,
           disposition:
             result.call_status === 'busy'
               ? CallStatusApiDispositionEnum.USER_BUSY
