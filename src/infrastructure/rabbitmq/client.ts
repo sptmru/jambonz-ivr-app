@@ -7,6 +7,10 @@ interface MessageHandler {
   (param1: CallDetails): Promise<void>;
 }
 
+// MQ Consumer handler must return 1 to requeue the message
+// (https://cody-greene.github.io/node-rabbitmq-client/latest/classes/Consumer.html)
+const REQUEUE_MESSAGE = 2;
+
 export class MQClient {
   private connection: Connection;
   private sub: Consumer;
@@ -83,10 +87,10 @@ export class MQClient {
             return 0; // Acknowledge the message
           } catch (err) {
             logger.error(`Consumer error on queue ${queueName}: ${err}`);
-            throw err;
+            return REQUEUE_MESSAGE;
           }
         } else {
-          throw new Error('Too many messages being processed');
+          return REQUEUE_MESSAGE;
         }
       }
     );
