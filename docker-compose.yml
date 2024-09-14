@@ -33,17 +33,24 @@ services:
     ports:
       - '3008:3008'
   ivr-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    entrypoint: ./docker-entrypoint.sh
+    image: sptmru/jambonz-ivr-app:0.55
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:
       - ./logs:/usr/src/app/logs
     restart: unless-stopped
     environment:
-      - LOKI_ENABLED=false
+      LOKI_ENABLED: ${LOKI_ENABLED}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_TO_FILE: ${LOG_TO_FILE}
+      HTTP_PORT: ${HTTP_PORT}
+      WS_ENABLED: ${WS_ENABLED}
+      JAMBONZ_ACCOUNT_SID: ${JAMBONZ_ACCOUNT_SID}
+      JAMBONZ_APPLICATION_SID: ${JAMBONZ_APPLICATION_SID}
+      JAMBONZ_API_KEY: ${JAMBONZ_API_KEY}
+      JAMBONZ_BASE_URL: ${JAMBONZ_BASE_URL}
+      JAMBONZ_CALLBACK_BASE_URL: ${JAMBONZ_CALLBACK_BASE_URL}
+      JAMBONZ_SIP_REALM: ${JAMBONZ_SIP_REALM}
     ports:
       - '${HTTP_PORT:-8080}:${HTTP_PORT:-8080}'
       - '${WS_PORT:-8081}:${WS_PORT:-8081}'
