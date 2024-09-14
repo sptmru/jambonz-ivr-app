@@ -136,6 +136,8 @@ export class CallbacksService {
   }
 
   static dtmfCallback(result: DtmfResult): WebhookResponse {
+    logger.debug(`DTMF callback received`);
+    logger.debug(`Transaction ID is ${result.customerData.transactionId}`);
     const callDetails = result.customerData;
 
     logger.info({
