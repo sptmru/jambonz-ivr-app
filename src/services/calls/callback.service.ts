@@ -209,9 +209,15 @@ export class CallbacksService {
     }
 
     if (isBeep(result.type)) {
-      const webhookResponse = new WebhookResponse()
-        .play({ url: `${config.jambonz.audioCache.prefix}${callDetails.wavUrlVM}` })
-        .hangup();
+      const vmUrl = `${config.jambonz.audioCache.prefix}${callDetails.wavUrlVM}`;
+      let webhookResponse: WebhookResponse;
+      if (vmUrl) {
+        webhookResponse = new WebhookResponse()
+            .play({ url: vmUrl })
+            .hangup();
+      } else {
+        webhookResponse = new WebhookResponse().hangup();
+      }
 
       void CallStatusApiWrapper.sendTransactionData({
         transactionid: callDetails.transactionId,
