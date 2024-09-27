@@ -65,7 +65,9 @@ export class MQClient {
     this.sub = this.connection.createConsumer(
       {
         queue: queueName,
-        queueOptions: { durable: true },
+        queueOptions: config.rabbitmq.queueType === 'quorum'
+            ? { durable: true, arguments: { "x-queue-type": "quorum" } }
+            : { durable: true },
         qos: { prefetchCount: this.MAX_MESSAGES },
       },
        msg => {

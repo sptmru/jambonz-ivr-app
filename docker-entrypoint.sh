@@ -51,6 +51,7 @@ sed -i "s|RABBITMQ_USER=rabbitmq|RABBITMQ_USER=${RABBITMQ_USER:-rabbitmq}|" ./bu
 sed -i "s|RABBITMQ_PASSWORD=rabbitmq|RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-rabbitmq}|" ./build/.env
 sed -i "s|RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG|RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE:-SWQOKODSQALRPCLNMEQG}|" ./build/.env
 sed -i "s|RABBITMQ_HEARTBEAT=60|RABBITMQ_HEARTBEAT=${RABBITMQ_HEARTBEAT:-60}|" ./build/.env
+sed -i "s|RABBITMQ_QUEUE_TYPE=classic|RABBITMQ_QUEUE_TYPE=${RABBITMQ_QUEUE_TYPE:-classic}|" ./build/.env
 
 sed -i "s|REDIS_URI=redis://default:lnasdoifna0asd@redis:6379|REDIS_URI=${REDIS_URI:-redis://default:lnasdoifna0asd@redis:6379}|" ./build/.env
 sed -i "s|REDIS_JSON_TYPE=calldetails|REDIS_JSON_TYPE=${REDIS_JSON_TYPE:-calldetails}|" ./build/.env

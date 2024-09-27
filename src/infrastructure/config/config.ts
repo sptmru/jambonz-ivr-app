@@ -87,6 +87,7 @@ export const config = {
     callsQueue: parsedConfig?.RABBITMQ_CALLS_QUEUE != null ? parsedConfig.RABBITMQ_CALLS_QUEUE : 'calls_queue',
     prefetchCount: parsedConfig?.RABBITMQ_PREFETCH_COUNT != null ? Number(parsedConfig.RABBITMQ_PREFETCH_COUNT) : 10,
     heartbeat: parsedConfig?.RABBITMQ_HEARTBEAT != null ? Number(parsedConfig.RABBITMQ_HEARTBEAT) : 60,
+    queueType: parsedConfig?.RABBITMQ_QUEUE_TYPE !== null && parsedConfig?.RABBITMQ_QUEUE_TYPE?.toLowerCase() === 'quorum' ? 'quorum' : 'classic',
   },
   redis: {
     uri: parsedConfig?.REDIS_URI != null ? parsedConfig.REDIS_URI : 'redis://default:lnasdoifna0asd@localhost:6379',
