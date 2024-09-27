@@ -65,7 +65,7 @@ export class MQClient {
     this.sub = this.connection.createConsumer(
       {
         queue: queueName,
-        queueOptions: { durable: false },
+        queueOptions: { durable: true },
         qos: { prefetchCount: this.MAX_MESSAGES },
       },
        msg => {
