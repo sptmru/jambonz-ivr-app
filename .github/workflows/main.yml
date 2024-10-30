@@ -87,8 +87,23 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/jambonz-ivr-app:${{ steps.increment_version.outputs.new_version }} .
+      - name: Build and push app Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/jambonz-ivr-app:${{ steps.increment_version.outputs.new_version }}
 
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/jambonz-ivr-app:${{ steps.increment_version.outputs.new_version }}
+      - name: Set up QEMU for ARM builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Build and push app Docker image for ARM
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/jambonz-ivr-app:${{ steps.increment_version.outputs.new_version }}-arm
