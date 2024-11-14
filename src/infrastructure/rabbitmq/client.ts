@@ -2,6 +2,7 @@ import Connection, { Consumer, Publisher } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
+import { FSStatusApiWrapper } from '../../services/third-party/fs-status-api-wrapper.service';
 
 interface MessageHandler {
   (param1: CallDetails): Promise<void>;
@@ -20,13 +21,10 @@ export class MQClient {
   public isConnected: boolean = false;
   private static instance: MQClient | null = null;
 
-  private messageCount: number = 0;
   private readonly MAX_MESSAGES: number = config.rabbitmq.prefetchCount;
-  private readonly TIME_INTERVAL: number = 10000;
 
   constructor() {
     this.connect();
-    this.setupMessageCounterReset();
   }
 
   static getInstance(): MQClient {
@@ -48,12 +46,6 @@ export class MQClient {
     });
   }
 
-  private setupMessageCounterReset(): void {
-    setInterval(() => {
-      this.messageCount = 0;
-    }, this.TIME_INTERVAL);
-  }
-
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
     this.queueName = queueName;
 
@@ -70,8 +62,7 @@ export class MQClient {
             : { durable: true },
         qos: { prefetchCount: this.MAX_MESSAGES },
       },
-       msg => {
-        if (this.messageCount < this.MAX_MESSAGES) {
+       async msg => {
           try {
             const parsedMessage = JSON.parse(msg.body);
             logger.info({
@@ -84,16 +75,18 @@ export class MQClient {
               },
             });
 
+            const canProcess = await FSStatusApiWrapper.checkIfWeCanProcessNewCalls();
+
+            if (!canProcess) {
+              return REQUEUE_MESSAGE;
+            }
+
             void messageHandler(parsedMessage);
-            this.messageCount++;
             return 0; // Acknowledge the message
           } catch (err) {
             logger.error(`Consumer error on queue ${queueName}: ${err}`);
             return REQUEUE_MESSAGE;
           }
-        } else {
-          return REQUEUE_MESSAGE;
-        }
       }
     );
     this.isConsuming = true;
