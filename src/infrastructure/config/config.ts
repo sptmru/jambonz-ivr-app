@@ -108,6 +108,7 @@ export const config = {
           : 'http://fs-status-api:8479/api/v1',
       bearerToken: 
         parsedConfig?.FS_STATUS_API_BEARER_TOKEN != null ? parsedConfig.FS_STATUS_API_BEARER_TOKEN : 'token',
+      cacheTTL: parsedConfig?.FS_STATUS_API_CACHE_TTL != null ? Number(parsedConfig.FS_STATUS_API_CACHE_TTL) : 5000,
     },
   },
   calls: {
