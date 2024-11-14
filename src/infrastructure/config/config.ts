@@ -101,8 +101,17 @@ export const config = {
           ? parsedConfig.CALL_STATUS_API_BASE_URL
           : 'https://portal.dialytica.com/api',
     },
+    fsStatusApi: {
+      baseUrl:
+        parsedConfig?.FS_STATUS_API_BASE_URL != null
+          ? parsedConfig.FS_STATUS_API_BASE_URL
+          : 'http://fs-status-api:8479/api/v1',
+      bearerToken: 
+        parsedConfig?.FS_STATUS_API_BEARER_TOKEN != null ? parsedConfig.FS_STATUS_API_BEARER_TOKEN : 'token',
+    },
   },
   calls: {
     dtmfGatherTimeout: parsedConfig?.DTMF_GATHER_TIMEOUT != null ? Number(parsedConfig.DTMF_GATHER_TIMEOUT) : 15,
+    expectedNumberOfCalls: parsedConfig?.EXPECTED_NUMBER_OF_CALLS != null ? Number(parsedConfig.EXPECTED_NUMBER_OF_CALLS) : 20000,
   },
 };

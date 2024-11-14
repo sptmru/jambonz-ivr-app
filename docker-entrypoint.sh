@@ -59,6 +59,10 @@ sed -i "s|REDIS_PASSWORD=lnasdoifna0asd|REDIS_PASSWORD=${REDIS_PASSWORD:-lnasdoi
 
 sed -i "s|CALL_STATUS_API_BASE_URL=https://portal.dialytica.com/api|CALL_STATUS_API_BASE_URL=${CALL_STATUS_API_BASE_URL:-https://portal.dialytica.com/api}|" ./build/.env
 
+sed -i "s|FS_STATUS_API_BASE_URL=http://fs-status-api:8479/api/v1|FS_STATUS_API_BASE_URL=${FS_STATUS_API_BASE_URL:-http://fs-status-api:8479/api/v1}|" ./build/.env
+sed -i "s|FS_STATUS_API_BEARER_TOKEN=token|FS_STATUS_API_BEARER_TOKEN=${FS_STATUS_API_BEARER_TOKEN:-token}|" ./build/.env
+sed -i "s|EXPECTED_NUMBER_OF_CONCURRENT_CALLS=20000|EXPECTED_NUMBER_OF_CONCURRENT_CALLS=${EXPECTED_NUMBER_OF_CONCURRENT_CALLS:-20000}|" ./build/.env
+
 sed -i "s|DTMF_GATHER_TIMEOUT=15|DTMF_GATHER_TIMEOUT=${DTMF_GATHER_TIMEOUT:-15}|" ./build/.env
 
 # Start service
