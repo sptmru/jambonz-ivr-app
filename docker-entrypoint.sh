@@ -17,6 +17,13 @@ sed -i "s|LOKI_JSON=false|LOKI_JSON=${LOKI_JSON:-false}|" ./build/.env
 sed -i "s|LOKI_INTERVAL=5|LOKI_INTERVAL=${LOKI_INTERVAL:-5}|" ./build/.env
 sed -i "s|LOKI_TIMEOUT=10000|LOKI_TIMEOUT=${LOKI_TIMEOUT:-10000}|" ./build/.env
 
+sed -i "s|GRAYLOG_ENABLED=false|GRAYLOG_ENABLED=${GRAYLOG_ENABLED:-false}|" ./build/.env
+sed -i "s|GRAYLOG_HOST=graylog|GRAYLOG_HOST=${GRAYLOG_HOST:-graylog}|" ./build/.env
+sed -i "s|GRAYLOG_PORT=12201|GRAYLOG_PORT=${GRAYLOG_PORT:-12201}|" ./build/.env
+sed -i "s|GRAYLOG_HOSTNAME=graylog|GRAYLOG_HOSTNAME=${GRAYLOG_HOSTNAME:-graylog}|" ./build/.env
+sed -i "s|GRAYLOG_FACILITY=ivrapp|GRAYLOG_FACILITY=${GRAYLOG_FACILITY:-ivrapp}|" ./build/.env
+sed -i "s|GRAYLOG_BUFFER_SIZE=1400|GRAYLOG_BUFFER_SIZE=${GRAYLOG_BUFFER_SIZE:-1400}|" ./build/.env
+
 sed -i "s|HTTP_HOSTNAME=http://localhost:8476|HTTP_HOSTNAME=${HTTP_HOSTNAME:-http://localhost:8476}|" ./build/.env
 sed -i "s|HTTP_PORT=8476|HTTP_PORT=${HTTP_PORT:-8476}|" ./build/.env
 

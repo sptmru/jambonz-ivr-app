@@ -28,6 +28,14 @@ export const config = {
     interval: parsedConfig?.LOKI_INTERVAL != null ? Number(parsedConfig.LOKI_INTERVAL) : 5,
     timeout: parsedConfig?.LOKI_TIMEOUT != null ? Number(parsedConfig.LOKI_TIMEOUT) : 10000,
   },
+  graylog: {
+    enabled: parsedConfig?.GRAYLOG_ENABLED != null ? parsedConfig.GRAYLOG_ENABLED.toLowerCase() === 'true' : false,
+    host: parsedConfig?.GRAYLOG_HOST != null ? parsedConfig.GRAYLOG_HOST : 'graylog',
+    port: parsedConfig?.GRAYLOG_PORT != null ? Number(parsedConfig.GRAYLOG_PORT) : 12201,
+    hostname: parsedConfig?.GRAYLOG_HOSTNAME != null ? parsedConfig.GRAYLOG_HOSTNAME : 'graylog',
+    facility: parsedConfig?.GRAYLOG_FACILITY != null ? parsedConfig.GRAYLOG_FACILITY : 'ivrapp',
+    bufferSize: parsedConfig?.GRAYLOG_BUFFER_SIZE != null ? Number(parsedConfig.GRAYLOG_BUFFER_SIZE) : 1400,
+  },
   api: {
     port: parsedConfig?.HTTP_PORT != null ? Number(parsedConfig.HTTP_PORT) : 3000,
     hostname: parsedConfig?.HTTP_HOSTNAME != null ? parsedConfig.HTTP_HOSTNAME : 'http://localhost',
