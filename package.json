@@ -34,6 +34,7 @@
     "@fastify/swagger-ui": "^3.0.0",
     "@jambonz/node-client": "^0.3.74",
     "@jambonz/node-client-ws": "^0.1.43",
+    "@pskzcompany/winston-graylog": "^1.0.1",
     "@sentry/cli": "^2.31.0",
     "@sentry/node": "^7.110.0",
     "@sentry/profiling-node": "^7.110.0",
