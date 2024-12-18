@@ -1,12 +1,11 @@
 import * as winston from 'winston';
-import Sentry from 'winston-transport-sentry-node';
 import LokiTransport from 'winston-loki';
 
 import { config } from '../infrastructure/config/config';
 import { ConsoleTransportInstance, FileTransportInstance } from 'winston/lib/winston/transports';
-import SentryTransport from 'winston-transport-sentry-node';
+import { WinstonGraylog } from '@pskzcompany/winston-graylog';
 
-type TransportUnion = LokiTransport | SentryTransport | FileTransportInstance | ConsoleTransportInstance;
+type TransportUnion = LokiTransport | FileTransportInstance | ConsoleTransportInstance | WinstonGraylog;
 
 const consoleLogFormat = winston.format.combine(
   winston.format.colorize(),
@@ -18,13 +17,6 @@ const fileLogFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
 );
-
-const sentryOptions = {
-  sentry: {
-    dsn: config.sentry.dsn,
-  },
-  level: config.sentry.logLevel,
-};
 
 const lokiOptions = {
   host: config.loki.host,
@@ -38,20 +30,35 @@ const lokiOptions = {
   },
 };
 
+const graylogOptions = {
+  level: config.log.level,
+  handleExceptions: true,
+  exceptionsLevel: 'error',
+  graylog: {
+    servers: [{ host: config.graylog.host, port: config.graylog.port }],
+    hostname: config.graylog.hostname,
+    facility: config.graylog.facility,
+    bufferSize: config.graylog.bufferSize,
+  },
+};
+
 const transportListWithFile: TransportUnion[] = [
   new winston.transports.Console({ format: consoleLogFormat }),
-  new Sentry(sentryOptions),
   new winston.transports.File({ filename: `${config.log.directory}/${config.log.file}`, format: fileLogFormat }),
 ];
 
 const transportListWithoutFile: TransportUnion[] = [
   new winston.transports.Console({ format: consoleLogFormat }) as ConsoleTransportInstance,
-  new Sentry(sentryOptions) as SentryTransport,
 ];
 
 if (config.loki.enabled) {
   transportListWithFile.push(new LokiTransport(lokiOptions));
   transportListWithoutFile.push(new LokiTransport(lokiOptions));
+}
+
+if (config.graylog.enabled) {
+  transportListWithFile.push(new WinstonGraylog(graylogOptions));
+  transportListWithoutFile.push(new WinstonGraylog(graylogOptions));
 }
 
 const logger = winston.createLogger({
