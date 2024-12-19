@@ -74,10 +74,13 @@ export class MQClient {
                 number_from: parsedMessage.numberFrom,
               },
             });
+            logger.info(`We are going to process a call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`);
 
             const canProcess = await FSStatusApiWrapper.checkIfWeCanProcessNewCalls();
 
             if (!canProcess) {
+              const requeueStatus = REQUEUE_MESSAGE - 1 === 0 ? 'enabled' : 'disabled'; 
+              logger.info(`We cannot process a call request to ${parsedMessage.number_to}, transaction ID: ${parsedMessage.transactionId}. Requeue status: ${requeueStatus}`);
               return REQUEUE_MESSAGE;
             }
 
