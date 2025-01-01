@@ -121,6 +121,7 @@ export const config = {
   },
   calls: {
     dtmfGatherTimeout: parsedConfig?.DTMF_GATHER_TIMEOUT != null ? Number(parsedConfig.DTMF_GATHER_TIMEOUT) : 15,
-    expectedNumberOfCalls: parsedConfig?.EXPECTED_NUMBER_OF_CALLS != null ? Number(parsedConfig.EXPECTED_NUMBER_OF_CALLS) : 20000,
+    maxConcurrentCallsPerInstance: parsedConfig?.MAX_NUMBER_OF_CONCURRENT_CALLS_PER_INSTANCE != null ? Number(parsedConfig.MAX_NUMBER_OF_CONCURRENT_CALLS_PER_INSTANCE) : 20,
+    expectedNumberOfCalls: parsedConfig?.EXPECTED_NUMBER_OF_CONCURRENT_CALLS != null ? Number(parsedConfig.EXPECTED_NUMBER_OF_CONCURRENT_CALLS) : 20000,
   },
 };
