@@ -12,9 +12,10 @@ import { DtmfResult } from '../../domain/types/dtmfresult.type';
 import { IvrInitiateResult } from '../../domain/types/ivrinitiateresult.type';
 import { CallStatusApiWrapper } from '../third-party/call-status-api-wrapper.service';
 import { CallStatusApiDispositionEnum } from '../../domain/types/call-status-api/dtmfpayload.type';
-import { CallStatus } from '../../domain/types/callstatus.type';
+import { CallStatus, isFinalCallStatus } from '../../domain/types/callstatus.type';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
 import { CallsService } from './calls.service';
+import { MQClient } from '../../infrastructure/rabbitmq/client';
 
 export class CallbacksService {
   static ivrInitiateCallback(result: IvrInitiateResult): WebhookResponse {
@@ -268,6 +269,10 @@ export class CallbacksService {
               ? CallStatusApiDispositionEnum.USER_BUSY
               : CallStatusApiDispositionEnum.NO_ANSWER,
         });
+      }
+
+      if (isFinalCallStatus(result.call_status)) {
+        MQClient.getInstance().decrementActiveCalls();
       }
     }
   }

@@ -2,7 +2,6 @@ import Connection, { Consumer, Publisher } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
-import { FSStatusApiWrapper } from '../../services/third-party/fs-status-api-wrapper.service';
 
 interface MessageHandler {
   (param1: CallDetails): Promise<void>;
@@ -19,9 +18,12 @@ export class MQClient {
   private queueName: string;
   private isConsuming: boolean = false;
   public isConnected: boolean = false;
+  public isPaused: boolean = false;
   private static instance: MQClient | null = null;
+  private messageHandler: MessageHandler;
+  private activeCalls: number = 0;
 
-  private readonly MAX_MESSAGES: number = config.rabbitmq.prefetchCount;
+  private readonly MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE: number = config.calls.maxConcurrentCallsPerInstance;
 
   constructor() {
     this.connect();
@@ -48,6 +50,7 @@ export class MQClient {
 
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
     this.queueName = queueName;
+    this.messageHandler = messageHandler;
 
     if (this.isConsuming) {
       logger.warn(`Already consuming from ${this.queueName}`);
@@ -60,9 +63,13 @@ export class MQClient {
         queueOptions: config.rabbitmq.queueType === 'quorum'
             ? { durable: true, arguments: { "x-queue-type": "quorum" } }
             : { durable: true },
-        qos: { prefetchCount: this.MAX_MESSAGES },
+        qos: { prefetchCount: this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE },
       },
-       async msg => {
+        async msg => {
+          if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
+            await this.pauseConsumption();
+            return REQUEUE_MESSAGE;
+          }
           try {
             const parsedMessage = JSON.parse(msg.body);
             logger.info({
@@ -76,14 +83,7 @@ export class MQClient {
             });
             logger.info(`We are going to process a call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`);
 
-            const canProcess = await FSStatusApiWrapper.checkIfWeCanProcessNewCalls();
-
-            if (!canProcess) {
-              const requeueStatus = REQUEUE_MESSAGE - 1 === 0 ? 'enabled' : 'disabled'; 
-              logger.info(`We cannot process a call request to ${parsedMessage.number_to}, transaction ID: ${parsedMessage.transactionId}. Requeue status: ${requeueStatus}`);
-              return REQUEUE_MESSAGE;
-            }
-
+            this.activeCalls++;
             void messageHandler(parsedMessage);
             return 0; // Acknowledge the message
           } catch (err) {
@@ -97,6 +97,32 @@ export class MQClient {
     this.sub.on('error', err => {
       logger.error(`Consumer error on queue ${queueName}: ${err}`);
     });
+  }
+
+  async pauseConsumption(): Promise<void> {
+    if (this.isConsuming) {
+      await this.sub.close();
+      this.isConsuming = false;
+      this.isPaused = true;
+      logger.info(`Paused consumption from ${this.queueName}`);
+    }
+  }
+
+  resumeConsumption(): void {
+    if (!this.isConsuming && this.isPaused) {
+      this.consumeToQueue(this.queueName, this.messageHandler);
+      this.isPaused = false;
+      logger.info(`Resumed consumption from ${this.queueName}`);
+    }
+  }
+
+  decrementActiveCalls(): void {
+    if (this.activeCalls > 0) {
+      this.activeCalls--;
+    }
+    if (this.activeCalls < this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
+      this.resumeConsumption();
+    }
   }
 
   async onShutdown(): Promise<void> {
