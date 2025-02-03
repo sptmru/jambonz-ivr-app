@@ -95,8 +95,7 @@ export const config = {
     callsQueue: parsedConfig?.RABBITMQ_CALLS_QUEUE != null ? parsedConfig.RABBITMQ_CALLS_QUEUE : 'calls_queue',
     prefetchCount: parsedConfig?.RABBITMQ_PREFETCH_COUNT != null ? Number(parsedConfig.RABBITMQ_PREFETCH_COUNT) : 10,
     heartbeat: parsedConfig?.RABBITMQ_HEARTBEAT != null ? Number(parsedConfig.RABBITMQ_HEARTBEAT) : 60,
-    // eslint-disable-next-line
-    queueType: parsedConfig?.RABBITMQ_QUEUE_TYPE !== null && parsedConfig?.RABBITMQ_QUEUE_TYPE?.toLowerCase() === 'quorum' ? 'quorum' : 'classic',
+    queueType: parsedConfig?.RABBITMQ_QUEUE_TYPE?.toLowerCase() === 'quorum' ? 'quorum' : 'classic',
   },
   redis: {
     uri: parsedConfig?.REDIS_URI != null ? parsedConfig.REDIS_URI : 'redis://default:lnasdoifna0asd@localhost:6379',
@@ -114,14 +113,19 @@ export const config = {
         parsedConfig?.FS_STATUS_API_BASE_URL != null
           ? parsedConfig.FS_STATUS_API_BASE_URL
           : 'http://fs-status-api:8479/api/v1',
-      bearerToken: 
-        parsedConfig?.FS_STATUS_API_BEARER_TOKEN != null ? parsedConfig.FS_STATUS_API_BEARER_TOKEN : 'token',
+      bearerToken: parsedConfig?.FS_STATUS_API_BEARER_TOKEN != null ? parsedConfig.FS_STATUS_API_BEARER_TOKEN : 'token',
       cacheTTL: parsedConfig?.FS_STATUS_API_CACHE_TTL != null ? Number(parsedConfig.FS_STATUS_API_CACHE_TTL) : 0,
     },
   },
   calls: {
     dtmfGatherTimeout: parsedConfig?.DTMF_GATHER_TIMEOUT != null ? Number(parsedConfig.DTMF_GATHER_TIMEOUT) : 15,
-    maxConcurrentCallsPerInstance: parsedConfig?.MAX_NUMBER_OF_CONCURRENT_CALLS_PER_INSTANCE != null ? Number(parsedConfig.MAX_NUMBER_OF_CONCURRENT_CALLS_PER_INSTANCE) : 20,
-    expectedNumberOfCalls: parsedConfig?.EXPECTED_NUMBER_OF_CONCURRENT_CALLS != null ? Number(parsedConfig.EXPECTED_NUMBER_OF_CONCURRENT_CALLS) : 20000,
+    maxConcurrentCallsPerInstance:
+      parsedConfig?.MAX_NUMBER_OF_CONCURRENT_CALLS_PER_INSTANCE != null
+        ? Number(parsedConfig.MAX_NUMBER_OF_CONCURRENT_CALLS_PER_INSTANCE)
+        : 20,
+    expectedNumberOfCalls:
+      parsedConfig?.EXPECTED_NUMBER_OF_CONCURRENT_CALLS != null
+        ? Number(parsedConfig.EXPECTED_NUMBER_OF_CONCURRENT_CALLS)
+        : 20000,
   },
 };

@@ -13,7 +13,11 @@ export enum CallStatusEnum {
   QUEUED = 'queued',
 }
 
-export type FinalCallStatus = CallStatusEnum.COMPLETED | CallStatusEnum.BUSY | CallStatusEnum.NO_ANSWER | CallStatusEnum.FAILED;
+export type FinalCallStatus =
+  | CallStatusEnum.COMPLETED
+  | CallStatusEnum.BUSY
+  | CallStatusEnum.NO_ANSWER
+  | CallStatusEnum.FAILED;
 
 export const isFinalCallStatus = (value: string): value is FinalCallStatus =>
   value === CallStatusEnum.COMPLETED ||

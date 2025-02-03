@@ -37,7 +37,7 @@ export class MQClient {
   }
 
   private connect(): void {
-    this.connection = new Connection({ url: config.rabbitmq.uri, heartbeat: config.rabbitmq.heartbeat } );
+    this.connection = new Connection({ url: config.rabbitmq.uri, heartbeat: config.rabbitmq.heartbeat });
     this.connection.on('error', err => {
       this.isConnected = false;
       logger.error(`RabbitMQ connection error: ${err}`);
@@ -60,36 +60,39 @@ export class MQClient {
     this.sub = this.connection.createConsumer(
       {
         queue: queueName,
-        queueOptions: config.rabbitmq.queueType === 'quorum'
-            ? { durable: true, arguments: { "x-queue-type": "quorum" } }
+        queueOptions:
+          config.rabbitmq.queueType === 'quorum'
+            ? { durable: true, arguments: { 'x-queue-type': 'quorum' } }
             : { durable: true },
         qos: { prefetchCount: this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE },
       },
-        async msg => {
-          if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
-            await this.pauseConsumption();
-            return REQUEUE_MESSAGE;
-          }
-          try {
-            const parsedMessage = JSON.parse(msg.body);
-            logger.info({
-              message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
-              labels: {
-                job: config.loki.labels.job,
-                transaction_id: parsedMessage.transactionId,
-                number_to: parsedMessage.numberTo,
-                number_from: parsedMessage.numberFrom,
-              },
-            });
-            logger.info(`We are going to process a call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`);
+      async msg => {
+        if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
+          await this.pauseConsumption();
+          return REQUEUE_MESSAGE;
+        }
+        try {
+          const parsedMessage = JSON.parse(msg.body);
+          logger.info({
+            message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
+            labels: {
+              job: config.loki.labels.job,
+              transaction_id: parsedMessage.transactionId,
+              number_to: parsedMessage.numberTo,
+              number_from: parsedMessage.numberFrom,
+            },
+          });
+          logger.info(
+            `We are going to process a call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`
+          );
 
-            this.activeCalls++;
-            void messageHandler(parsedMessage);
-            return 0; // Acknowledge the message
-          } catch (err) {
-            logger.error(`Consumer error on queue ${queueName}: ${err}`);
-            return REQUEUE_MESSAGE;
-          }
+          this.activeCalls++;
+          void messageHandler(parsedMessage);
+          return 0; // Acknowledge the message
+        } catch (err) {
+          logger.error(`Consumer error on queue ${queueName}: ${err}`);
+          return REQUEUE_MESSAGE;
+        }
       }
     );
     this.isConsuming = true;

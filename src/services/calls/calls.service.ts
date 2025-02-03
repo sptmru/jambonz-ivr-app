@@ -86,13 +86,16 @@ export class CallsService {
         tag: callDetails,
       });
       logger.info(`Call request to ${callDetails.numberTo}, transaction ID: ${callDetails.transactionId} processed`);
-    } catch(err) {
-      logger.error({ message: `Got error from Jambonz API when creating a call: ${err}`, labels: {
+    } catch (err) {
+      logger.error({
+        message: `Got error from Jambonz API when creating a call: ${err}`,
+        labels: {
           job: config.loki.labels.job,
           transaction_id: callDetails.transactionId,
           number_to: callDetails.numberTo,
           number_from: callDetails.numberFrom,
-        }});
+        },
+      });
       logger.error(`Call request to ${callDetails.numberTo}, transaction ID: ${callDetails.transactionId} failed`);
     }
   }

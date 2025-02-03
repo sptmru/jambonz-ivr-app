@@ -1,9 +1,9 @@
-import axios from "axios";
-import { config } from "../../infrastructure/config/config";
-import { logger } from "../../misc/Logger";
+import axios from 'axios';
+import { config } from '../../infrastructure/config/config';
+import { logger } from '../../misc/Logger';
 
 export class FSStatusApiWrapper {
-  private static baseUrl  = config.thirdParty.fsStatusApi.baseUrl;
+  private static baseUrl = config.thirdParty.fsStatusApi.baseUrl;
 
   private static cachedResult: boolean | null = null;
   private static lastFetchedTime: number = 0;
@@ -11,15 +11,17 @@ export class FSStatusApiWrapper {
 
   static async checkIfWeCanProcessNewCalls(): Promise<boolean> {
     const currentTime = Date.now();
-    if (this.cacheDuration !== 0 
-        && this.cachedResult !== null 
-        && currentTime - this.lastFetchedTime < this.cacheDuration) {
+    if (
+      this.cacheDuration !== 0 &&
+      this.cachedResult !== null &&
+      currentTime - this.lastFetchedTime < this.cacheDuration
+    ) {
       return this.cachedResult;
     }
 
     try {
       const response = await axios.get(`${FSStatusApiWrapper.baseUrl}/instanceCalls/totalcalls`, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${config.thirdParty.fsStatusApi.bearerToken}`,
         },
       });

@@ -213,9 +213,7 @@ export class CallbacksService {
       const vmUrl = `${config.jambonz.audioCache.prefix}${callDetails.wavUrlVM}`;
       let webhookResponse: WebhookResponse;
       if (vmUrl) {
-        webhookResponse = new WebhookResponse()
-            .play({ url: vmUrl })
-            .hangup();
+        webhookResponse = new WebhookResponse().play({ url: vmUrl }).hangup();
       } else {
         webhookResponse = new WebhookResponse().hangup();
       }
