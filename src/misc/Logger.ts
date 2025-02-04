@@ -1,6 +1,8 @@
 import * as winston from 'winston';
 import LokiTransport from 'winston-loki';
 
+import Log2gelf from 'winston-log2gelf'
+
 import { config } from '../infrastructure/config/config';
 import { ConsoleTransportInstance, FileTransportInstance } from 'winston/lib/winston/transports';
 import { WinstonGraylog } from '@pskzcompany/winston-graylog';
@@ -30,17 +32,12 @@ const lokiOptions = {
   },
 };
 
-const graylogOptions = {
+const log2gelfOptions = {
   level: config.log.level,
-  handleExceptions: true,
-  exceptionsLevel: 'error',
-  graylog: {
-    servers: [{ host: config.graylog.host, port: config.graylog.port }],
-    hostname: config.graylog.hostname,
-    facility: config.graylog.facility,
-    bufferSize: config.graylog.bufferSize,
-  },
-};
+  host: config.graylog.host,
+  port: config.graylog.port,
+  protocol: 'tcp',
+}
 
 const transportListWithFile: TransportUnion[] = [
   new winston.transports.Console({ format: consoleLogFormat }),
@@ -57,8 +54,8 @@ if (config.loki.enabled) {
 }
 
 if (config.graylog.enabled) {
-  transportListWithFile.push(new WinstonGraylog(graylogOptions));
-  transportListWithoutFile.push(new WinstonGraylog(graylogOptions));
+  transportListWithFile.push(new Log2gelf(log2gelfOptions));
+  transportListWithoutFile.push(new Log2gelf(log2gelfOptions));
 }
 
 const logger = winston.createLogger({
