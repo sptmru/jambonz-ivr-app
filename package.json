@@ -44,6 +44,7 @@
     "rabbitmq-client": "^4.5.3",
     "redis": "^4.6.13",
     "winston": "^3.13.0",
+    "winston-log2gelf": "^2.4.1",
     "winston-loki": "^6.1.2",
     "winston-transport-sentry-node": "^2.7.1"
   }
