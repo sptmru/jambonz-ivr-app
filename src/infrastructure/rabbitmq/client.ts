@@ -69,7 +69,7 @@ export class MQClient {
       async msg => {
         if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
           await this.pauseConsumption();
-          return 2;
+          return REQUEUE_MESSAGE;
         }
         try {
           const parsedMessage = JSON.parse(msg.body);
@@ -91,7 +91,7 @@ export class MQClient {
           return 0; // Acknowledge the message
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
-          return 2;
+          return REQUEUE_MESSAGE;
         }
       }
     );
