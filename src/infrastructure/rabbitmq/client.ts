@@ -75,7 +75,7 @@ export class MQClient {
       async msg => {
         if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
           logger.warn(`Max concurrent calls reached. Dropping message.`);
-          return ConsumerStatus.ACK; // Acknowledge instead of requeueing
+          return 0; // Acknowledge instead of requeueing
         }
 
         try {
@@ -98,7 +98,7 @@ export class MQClient {
           await messageHandler(parsedMessage);
 
           this.decrementActiveCalls();
-          return ConsumerStatus.ACK; // Correct return type
+          return 0; // Correct return type
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
 
