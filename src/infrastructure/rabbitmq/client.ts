@@ -1,4 +1,4 @@
-import Connection, { Consumer, Publisher, ConsumerStatus } from 'rabbitmq-client';
+import Connection, { Consumer, Publisher } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
@@ -6,6 +6,10 @@ import { CallDetails } from '../../domain/types/calldetails.type';
 interface MessageHandler {
   (param1: CallDetails): Promise<void>;
 }
+
+// MQ Consumer handler must return 1 to requeue the message
+// (https://cody-greene.github.io/node-rabbitmq-client/latest/classes/Consumer.html)
+const REQUEUE_MESSAGE = 2;
 
 export class MQClient {
   private connection: Connection;
@@ -18,10 +22,11 @@ export class MQClient {
   private static instance: MQClient | null = null;
   private messageHandler: MessageHandler;
   private activeCalls: number = 0;
+
   private readonly MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE: number = config.calls.maxConcurrentCallsPerInstance;
 
-  private constructor() {
-    this.connectWithRetry();
+  constructor() {
+    this.connect();
   }
 
   static getInstance(): MQClient {
@@ -31,30 +36,16 @@ export class MQClient {
     return MQClient.instance;
   }
 
-  private async connectWithRetry(retries = 5, delayMs = 5000): Promise<void> {
-    while (retries > 0) {
-      try {
-        this.connection = new Connection({ url: config.rabbitmq.uri, heartbeat: config.rabbitmq.heartbeat });
-
-        this.connection.on('error', err => {
-          this.isConnected = false;
-          logger.error(`RabbitMQ connection error: ${err}`);
-        });
-
-        this.connection.on('connection', () => {
-          this.isConnected = true;
-          logger.info('RabbitMQ connection (re)established');
-        });
-
-        logger.info('RabbitMQ connection established successfully.');
-        return; // No explicit connect() call needed
-      } catch (err) {
-        retries--;
-        logger.error(`RabbitMQ connection failed. Retrying in ${delayMs}ms... (${retries} attempts left)`);
-        await new Promise(res => setTimeout(res, delayMs));
-      }
-    }
-    logger.error('RabbitMQ connection failed after multiple retries.');
+  private connect(): void {
+    this.connection = new Connection({ url: config.rabbitmq.uri, heartbeat: config.rabbitmq.heartbeat });
+    this.connection.on('error', err => {
+      this.isConnected = false;
+      logger.error(`RabbitMQ connection error: ${err}`);
+    });
+    this.connection.on('connection', () => {
+      this.isConnected = true;
+      logger.info('RabbitMQ connection (re)established');
+    });
   }
 
   consumeToQueue(queueName: string, messageHandler: MessageHandler): void {
@@ -69,19 +60,21 @@ export class MQClient {
     this.sub = this.connection.createConsumer(
       {
         queue: queueName,
-        queueOptions: { durable: true }, // Exclusive mode ensures only one consumer
+        queueOptions:
+          config.rabbitmq.queueType === 'quorum'
+            ? { durable: true, arguments: { 'x-queue-type': 'quorum' } }
+            : { durable: true },
         qos: { prefetchCount: this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE },
       },
       async msg => {
         if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
-          logger.warn(`Max concurrent calls reached. Dropping message.`);
-          return 0; // Acknowledge instead of requeueing
+          await this.pauseConsumption();
+          return 2;
         }
-
         try {
           const parsedMessage = JSON.parse(msg.body);
           logger.info({
-            message: `Received message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
+            message: `Received a message from ${queueName}: ${JSON.stringify(parsedMessage)}`,
             labels: {
               job: config.loki.labels.job,
               transaction_id: parsedMessage.transactionId,
@@ -89,27 +82,21 @@ export class MQClient {
               number_from: parsedMessage.numberFrom,
             },
           });
-
-          logger.info(`Processing call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`);
+          logger.info(
+            `We are going to process a call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`
+          );
 
           this.activeCalls++;
-
-          // Ensure message processing is awaited before acknowledgment
-          await messageHandler(parsedMessage);
-
-          this.decrementActiveCalls();
-          return 0; // Correct return type
+          void messageHandler(parsedMessage);
+          return 0; // Acknowledge the message
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
-
-          // Instead of requeueing, reject the message so it is NOT processed again
-          return ConsumerStatus.DROP; // Negative Acknowledgment without reque
-
+          return 2;
         }
       }
     );
-
     this.isConsuming = true;
+
     this.sub.on('error', err => {
       logger.error(`Consumer error on queue ${queueName}: ${err}`);
     });
@@ -142,27 +129,8 @@ export class MQClient {
   }
 
   async onShutdown(): Promise<void> {
-    logger.info('Shutting down RabbitMQ connection...');
-    try {
-      await this.sub.close();
-      await this.pub?.close();
-      await this.connection.close();
-      logger.info('RabbitMQ shutdown complete.');
-    } catch (err) {
-      logger.error(`Error during RabbitMQ shutdown: ${err}`);
-    }
+    await this.sub.close();
+    await this.pub?.close();
+    await this.connection.close();
   }
 }
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  logger.info('Received SIGTERM. Shutting down consumer.');
-  await MQClient.getInstance().onShutdown();
-  process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  logger.info('Received SIGINT. Shutting down consumer.');
-  await MQClient.getInstance().onShutdown();
-  process.exit(0);
-});
