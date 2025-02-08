@@ -1,4 +1,4 @@
-import Connection, { Consumer, Publisher, ConsumerStatus } from 'rabbitmq-client';
+import Connection, { Consumer, Publisher } from 'rabbitmq-client';
 import { config } from '../config/config';
 import { logger } from '../../misc/Logger';
 import { CallDetails } from '../../domain/types/calldetails.type';
@@ -6,6 +6,9 @@ import { CallDetails } from '../../domain/types/calldetails.type';
 interface MessageHandler {
   (param1: CallDetails): Promise<void>;
 }
+
+// MQ Consumer handler must return 1 to requeue the message
+const REQUEUE_MESSAGE = 2;
 
 export class MQClient {
   private connection: Connection;
@@ -35,7 +38,7 @@ export class MQClient {
     while (retries > 0) {
       try {
         this.connection = new Connection({ url: config.rabbitmq.uri, heartbeat: config.rabbitmq.heartbeat });
-
+        
         this.connection.on('error', err => {
           this.isConnected = false;
           logger.error(`RabbitMQ connection error: ${err}`);
@@ -47,7 +50,7 @@ export class MQClient {
         });
 
         logger.info('RabbitMQ connection established successfully.');
-        return; // No explicit connect() call needed
+        return;
       } catch (err) {
         retries--;
         logger.error(`RabbitMQ connection failed. Retrying in ${delayMs}ms... (${retries} attempts left)`);
@@ -74,8 +77,8 @@ export class MQClient {
       },
       async msg => {
         if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
-          logger.warn(`Max concurrent calls reached. Dropping message.`);
-          return ConsumerStatus.Ack; // Acknowledge instead of requeueing
+          logger.warn(`Max concurrent calls reached. Requeuing message.`);
+          return { action: "reject", requeue: false };
         }
 
         try {
@@ -90,20 +93,20 @@ export class MQClient {
             },
           });
 
-          logger.info(`Processing call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`);
+          logger.info(
+            `Processing call request to ${parsedMessage.numberTo}, transaction ID: ${parsedMessage.transactionId}`
+          );
 
           this.activeCalls++;
-
-          // Ensure message processing is awaited before acknowledgment
+          
+          // Await message processing to avoid race conditions
           await messageHandler(parsedMessage);
 
           this.decrementActiveCalls();
-          return ConsumerStatus.Ack; // Correct return type
+          return 0; // Acknowledge message after successful processing
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
-
-          // Instead of requeueing, reject the message so it is NOT processed again
-          return ConsumerStatus.Reject;
+          return { action: "reject", requeue: false };
         }
       }
     );
