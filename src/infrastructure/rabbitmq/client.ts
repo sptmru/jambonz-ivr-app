@@ -69,7 +69,7 @@ export class MQClient {
     this.sub = this.connection.createConsumer(
       {
         queue: queueName,
-        queueOptions: { durable: true }, // Exclusive mode ensures only one consumer
+        queueOptions: { durable: true, exclusive: true }, // Exclusive mode ensures only one consumer
         qos: { prefetchCount: this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE },
       },
       async msg => {
