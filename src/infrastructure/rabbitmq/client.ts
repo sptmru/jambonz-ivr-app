@@ -49,6 +49,7 @@ export class MQClient {
           logger.info('RabbitMQ connection (re)established');
         });
 
+        await this.connection.connect();
         logger.info('RabbitMQ connection established successfully.');
         return;
       } catch (err) {
@@ -78,7 +79,7 @@ export class MQClient {
       async msg => {
         if (this.activeCalls >= this.MAX_CONCURRENT_CALLS_PER_IVR_APP_INSTANCE) {
           logger.warn(`Max concurrent calls reached. Requeuing message.`);
-          return { action: "reject", requeue: false };
+          return REQUEUE_MESSAGE;
         }
 
         try {
@@ -106,7 +107,7 @@ export class MQClient {
           return 0; // Acknowledge message after successful processing
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
-          return { action: "reject", requeue: false };
+          return REQUEUE_MESSAGE;
         }
       }
     );
