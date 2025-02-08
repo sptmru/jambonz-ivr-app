@@ -103,8 +103,7 @@ export class MQClient {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
 
           // Instead of requeueing, reject the message so it is NOT processed again
-          return { action: "nack", requeue: false };
-
+          return ConsumerStatus.REJECT;
         }
       }
     );
