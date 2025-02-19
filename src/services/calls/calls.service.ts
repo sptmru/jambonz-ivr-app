@@ -40,7 +40,7 @@ export class CallsService {
   }
   static async createCall(callDetails: CallDetails): Promise<void> {
     logger.info({
-      message: `Initial request to create a call to number ${callDetails.numberTo} received`,
+      message: `Initial request to create a call to number ${callDetails.numberTo} received, transaction ID is ${callDetails.transactionId}`,
       labels: {
         job: config.loki.labels.job,
         transaction_id: callDetails.transactionId,
