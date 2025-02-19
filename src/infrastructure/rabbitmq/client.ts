@@ -88,8 +88,7 @@ export class MQClient {
 
           this.activeCalls++;
 
-          // TODO: make messageHandler wait until the call is finished and replace "void" with "await"
-          void messageHandler(parsedMessage);
+          await messageHandler(parsedMessage);
           return 0; // Acknowledge the message
         } catch (err) {
           logger.error(`Consumer error on queue ${queueName}: ${err}`);
