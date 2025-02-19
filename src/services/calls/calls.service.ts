@@ -10,6 +10,7 @@ import { config } from '../../infrastructure/config/config';
 import { logger } from '../../misc/Logger';
 import { jambonz } from '../jambons/jambons-api-wrapper.service';
 import { PhoneNumberValidatorService } from './phonenumbervalidator.service';
+import { CallResolverStorageService } from './call-resolver-storage-service.service';
 
 export class CallsService {
   static prepareCallDestination(dest: string, callDetails: CallDetails, usePlusSign: boolean = false): CallDestination {
@@ -69,7 +70,7 @@ export class CallsService {
     });
 
     try {
-      await jambonz.calls.create({
+      const callSid = await jambonz.calls.create({
         from: callDetails.numberFrom,
         to: callDestinationData,
         application_sid: config.jambonz.applicationSid,
@@ -86,6 +87,8 @@ export class CallsService {
         tag: callDetails,
       });
       logger.info(`Call request to ${callDetails.numberTo}, transaction ID: ${callDetails.transactionId} processed`);
+      await new Promise<void>(resolve => CallResolverStorageService.getInstance().addCallToStorage(callSid, resolve));
+      return;
     } catch (err) {
       logger.error({
         message: `Got error from Jambonz API when creating a call: ${err}`,
@@ -97,6 +100,11 @@ export class CallsService {
         },
       });
       logger.error(`Call request to ${callDetails.numberTo}, transaction ID: ${callDetails.transactionId} failed`);
+      return;
     }
+  }
+
+  static resolveCallHandler(callSid: string): void {
+    CallResolverStorageService.getInstance().resolveCallHandler(callSid);
   }
 }
