@@ -52,7 +52,7 @@ export class KubernetesMetricsApiWrapper {
   async getIvrAppPods(): Promise<PodMetricsListItem[]> {
     const allPodsMetricsList = await this.getPodMetricsList();
     return allPodsMetricsList.items.filter(
-      (pod: PodMetricsListItem) => pod.metadata.labels && pod.metadata.labels.app === 'ivr-app'
+      (pod: PodMetricsListItem) => pod.metadata.labels && pod.metadata.labels.app === config.thirdParty.k8s.appName
     );
   }
 
