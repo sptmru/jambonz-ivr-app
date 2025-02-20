@@ -14,4 +14,18 @@ export class CallsController {
       return reply.code(500).send({ error: 'Internal server error' });
     }
   }
+
+  static resolveCallHandler(
+    request: FastifyRequest<{ Params: { callSid: string } }>,
+    reply: FastifyReply
+  ): FastifyReply {
+    const callSid = request.params.callSid;
+    try {
+      CallsService.resolveCallHandler(callSid);
+      return reply.code(200).send({ message: 'Call resolved successfully' });
+    } catch (err) {
+      logger.error(`Error while resolving a call via HTTP API: ${err.message}`);
+      return reply.code(500).send({ error: 'Internal server error' });
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import * as winston from 'winston';
 import LokiTransport from 'winston-loki';
 
-import Log2gelf from 'winston-log2gelf'
+import Log2gelf from 'winston-log2gelf';
 
 import { config } from '../infrastructure/config/config';
 import { ConsoleTransportInstance, FileTransportInstance } from 'winston/lib/winston/transports';
@@ -37,7 +37,7 @@ const log2gelfOptions = {
   host: config.graylog.host,
   port: config.graylog.port,
   protocol: 'tcp',
-}
+};
 
 const transportListWithFile: TransportUnion[] = [
   new winston.transports.Console({ format: consoleLogFormat }),

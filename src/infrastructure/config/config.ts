@@ -116,6 +116,25 @@ export const config = {
       bearerToken: parsedConfig?.FS_STATUS_API_BEARER_TOKEN != null ? parsedConfig.FS_STATUS_API_BEARER_TOKEN : 'token',
       cacheTTL: parsedConfig?.FS_STATUS_API_CACHE_TTL != null ? Number(parsedConfig.FS_STATUS_API_CACHE_TTL) : 0,
     },
+    k8s: {
+      metricsApi: {
+        baseUrl:
+          parsedConfig?.K8S_METRICS_API_BASE_URL != null
+            ? parsedConfig.K8S_METRICS_API_BASE_URL
+            : 'https://kubernetes.default.svc',
+      },
+      namespace: parsedConfig?.K8S_NAMESPACE != null ? parsedConfig.K8S_NAMESPACE : 'jambonz',
+      tokenPath:
+        parsedConfig?.K8S_TOKEN_PATH != null
+          ? parsedConfig.K8S_TOKEN_PATH
+          : '/var/run/secrets/kubernetes.io/serviceaccount/token',
+      podCountRefreshIntervalMs:
+        parsedConfig?.K8S_POD_COUNT_REFRESH_INTERVAL_MS != null
+          ? Number(parsedConfig.K8S_POD_COUNT_REFRESH_INTERVAL_MS)
+          : 300000,
+      defaultPodCount: parsedConfig?.K8S_DEFAULT_POD_COUNT != null ? Number(parsedConfig.K8S_DEFAULT_POD_COUNT) : 100,
+      appName: parsedConfig?.K8S_APP_NAME != null ? parsedConfig.K8S_APP_NAME : 'ivr-app',
+    },
   },
   calls: {
     dtmfGatherTimeout: parsedConfig?.DTMF_GATHER_TIMEOUT != null ? Number(parsedConfig.DTMF_GATHER_TIMEOUT) : 15,
