@@ -133,6 +133,7 @@ export const config = {
           ? Number(parsedConfig.K8S_POD_COUNT_REFRESH_INTERVAL_MS)
           : 300000,
       defaultPodCount: parsedConfig?.K8S_DEFAULT_POD_COUNT != null ? Number(parsedConfig.K8S_DEFAULT_POD_COUNT) : 100,
+      appName: parsedConfig?.K8S_APP_NAME != null ? parsedConfig.K8S_APP_NAME : 'ivr-app',
     },
   },
   calls: {

@@ -75,6 +75,7 @@ sed -i "s|K8S_NAMESPACE=jambonz|K8S_NAMESPACE=${K8S_NAMESPACE:-jambonz}|" ./buil
 sed -i "s|K8S_TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount/token|K8S_TOKEN_PATH=${K8S_TOKEN_PATH:-/var/run/secrets/kubernetes.io/serviceaccount/token}|" ./build/.env
 sed -i "s|K8S_POD_COUNT_REFRESH_INTERVAL_MS=300000|K8S_POD_COUNT_REFRESH_INTERVAL_MS=${K8S_POD_COUNT_REFRESH_INTERVAL_MS:-300000}|" ./build/.env
 sed -i "s|K8S_DEFAULT_POD_COUNT=100|K8S_DEFAULT_POD_COUNT=${K8S_DEFAULT_POD_COUNT:-100}|" ./build/.env
+sed -i "s|K8S_APP_NAME=ivr-app|K8S_APP_NAME=${K8S_APP_NAME:-ivr-app}|" ./build/.env
 
 
 sed -i "s|EXPECTED_NUMBER_OF_CONCURRENT_CALLS=20000|EXPECTED_NUMBER_OF_CONCURRENT_CALLS=${EXPECTED_NUMBER_OF_CONCURRENT_CALLS:-20000}|" ./build/.env
